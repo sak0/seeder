@@ -28,7 +28,7 @@ type Repository struct {
 	Description 	string		`json:"description" gorm:"type:varchar(255);column:description"`
 	PullCount 		int64		`json:"pull_count" gorm:"type:int;column:pull_count"`
 	StarCount 		int64		`json:"star_count" gorm:"type:int;column:star_count"`
-	TagsCount 		int64		`json:"tag_count" gorm:"type:int;column:pull_count"`
+	TagsCount 		int64		`json:"tag_count" gorm:"type:int;column:tags_count"`
 	VerifyStatus 	string		`json:"verify_status" gorm:"type:varchar(50);column:verify_status"`
 	Cached 			bool		`json:"cached" gorm:"type:bool;column:cached"`
 }
@@ -38,31 +38,30 @@ func (s Repository) TableName() string {
 
 type RepositoryTag struct {
 	gorm.Model
-	Digest 			string
-	TagName 		string
-	Size 			int64
-	Architecture 	string
-	OS 				string
-	OSVersion 		string
-	DockerVersion 	string
-	Author 			string
-
-	VerifyStatus 	string
-	Cached 			bool
+	Digest 			string		`json:"digest" gorm:"type:varchar(255);column:digest"`
+	TagName 		string		`json:"tag_name" gorm:"type:varchar(50);column:tag_name"`
+	Size 			int64		`json:"size" gorm:"type:int;column:size"`
+	Architecture 	string		`json:"architecture" gorm:"type:varchar(50);column:architecture"`
+	OS 				string		`json:"os" gorm:"type:varchar(50);column:tag_name"`
+	OSVersion 		string		`json:"os_version" gorm:"type:varchar(50);column:os_version"`
+	DockerVersion 	string		`json:"docker_version" gorm:"type:varchar(50);column:docker_version"`
+	Author 			string		`json:"author" gorm:"type:varchar(50);column:author"`
+	VerifyStatus 	string		`json:"verify_status" gorm:"type:varchar(50);column:verify_status"`
+	Cached 			bool		`json:"cached" gorm:"type:bool;column:cached"`
 }
 func (t RepositoryTag) TableName() string {
 	return "repository_tag"
 }
 
 type ChartRepo struct {
-	Name 			string
-	VersionCount 	int64
-	LatestVersion 	string
-	Icon 			string
-	Home 			string
-
-	VerifyStatus 	string
-	Cached 			bool
+	OwnerNode 		string		`json:"owner_name" gorm:"type:varchar(50);column:owner_name"`
+	Name 			string		`json:"name" gorm:"type:varchar(50);column:name"`
+	VersionCount 	int64		`json:"version_count" gorm:"type:int;column:size"`
+	LatestVersion 	string		`json:"latest_version" gorm:"type:varchar(50);column:latest_version"`
+	Icon 			string		`json:"icon" gorm:"type:varchar(50);column:icon"`
+	Home 			string		`json:"home" gorm:"type:varchar(50);column:home"`
+	VerifyStatus 	string		`json:"verify_status" gorm:"type:varchar(50);column:verify_status"`
+	Cached 			bool		`json:"cached" gorm:"type:bool;column:cached"`
 }
 func (c ChartRepo) TableName() string{
 	return "chart_repo"

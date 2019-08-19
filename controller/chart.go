@@ -35,3 +35,26 @@ func GetChartVersion(c *gin.Context) {
 	resp := Response{}
 	c.JSON(http.StatusOK, resp)
 }
+
+// @Summary 下载更新指定Chart仓库的指定版本到本地仓库
+// @Accept  json
+// @Produce json
+// @Param version body models.ChartVersion true "Download the version to local"
+// @Success 202 {object} models.ChartVersion
+// @Failure 500 {string} string "Internal Error"
+// @Router /api/v1/chart/{repo}/{version}/download [post]
+func UpdateChartVersion(c *gin.Context) {
+	resp := Response{}
+	c.JSON(http.StatusOK, resp)
+}
+
+// @Summary 删除本地指定Chart仓库的指定版本
+// @Accept  json
+// @Produce json
+// @Success 202 {object} models.ChartVersion
+// @Failure 500 {string} string "Internal Error"
+// @Router /api/v1/chart/{repo}/{version} [delete]
+func DeleteChartVersion(c *gin.Context) {
+	resp := Response{}
+	c.JSON(http.StatusOK, resp)
+}

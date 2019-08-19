@@ -10,7 +10,7 @@ import (
 	"github.com/mcuadros/go-gin-prometheus"
 	"github.com/swaggo/files"
 	"github.com/swaggo/gin-swagger"
-	_ "./docs"
+	_ "github.com/sak0/seeder/docs"
 	_ "github.com/go-sql-driver/mysql"
 
 	"github.com/sak0/seeder/pkg/utils"
@@ -72,7 +72,7 @@ func main() {
 	p.Use(r)
 	r.Use(gin.Recovery())
 
-	url := ginSwagger.URL(fmt.Sprintf("http://127.0.0.1:%d/swagger/doc.json", PortIUse)) // The url pointing to API definition
+	url := ginSwagger.URL(fmt.Sprintf("http://10.12.102.174:%d/swagger/doc.json", PortIUse)) // The url pointing to API definition
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
 
 	v1 := r.Group("/api/v1")
@@ -84,12 +84,16 @@ func main() {
 		{
 			repository.GET("", controller.GetRepository)
 			repository.GET(":id/tags", controller.GetRepositoryTags)
+			repository.POST(":id/:tag/download", controller.UpdateRepositoryTag)
+			repository.DELETE(":id/:tag", controller.DeleteRepositoryTag)
 		}
 
 		chart := v1.Group("/chart")
 		{
 			chart.GET("", controller.GetChartRepo)
 			chart.GET(":id/charts", controller.GetChartVersion)
+			chart.POST(":id/:version/download", controller.UpdateChartVersion)
+			chart.DELETE(":id/:version", controller.DeleteChartVersion)
 		}
 	}
 

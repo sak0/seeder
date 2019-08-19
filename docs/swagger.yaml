@@ -8,13 +8,15 @@ definitions:
         type: string
       icon:
         type: string
-      latestVersion:
+      latest_version:
         type: string
       name:
         type: string
-      verifyStatus:
+      owner_name:
         type: string
-      versionCount:
+      verify_status:
+        type: string
+      version_count:
         type: integer
     type: object
   models.ChartVersion:
@@ -61,17 +63,17 @@ definitions:
         type: boolean
       digest:
         type: string
-      dockerVersion:
+      docker_version:
         type: string
       os:
         type: string
-      osversion:
+      os_version:
         type: string
       size:
         type: integer
-      tagName:
+      tag_name:
         type: string
-      verifyStatus:
+      verify_status:
         type: string
     type: object
   models.SeederNode:
@@ -134,6 +136,46 @@ paths:
           schema:
             type: string
       summary: 获取Chart仓库列表
+  /api/v1/chart/{repo}/{version}:
+    delete:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "202":
+          description: Accepted
+          schema:
+            $ref: '#/definitions/models.ChartVersion'
+        "500":
+          description: Internal Error
+          schema:
+            type: string
+      summary: 删除本地指定Chart仓库的指定版本
+  /api/v1/chart/{repo}/{version}/download:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Download the version to local
+        in: body
+        name: version
+        required: true
+        schema:
+          $ref: '#/definitions/models.ChartVersion'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "202":
+          description: Accepted
+          schema:
+            $ref: '#/definitions/models.ChartVersion'
+        "500":
+          description: Internal Error
+          schema:
+            type: string
+      summary: 下载更新指定Chart仓库的指定版本到本地仓库
   /api/v1/chart/{repo}/charts:
     get:
       consumes:
@@ -191,7 +233,7 @@ paths:
           description: Internal Error
           schema:
             type: string
-      summary: 获取cloud-edge整体集群信息
+      summary: 获取edge-cloud整体集群信息
   /api/v1/health:
     get:
       produces:
@@ -235,6 +277,46 @@ paths:
           schema:
             type: string
       summary: 获取镜像仓库列表
+  /api/v1/repository/{repo}/{tag}:
+    delete:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "202":
+          description: Accepted
+          schema:
+            $ref: '#/definitions/models.RepositoryTag'
+        "500":
+          description: Internal Error
+          schema:
+            type: string
+      summary: 删除本地指定镜像仓库的指定tag
+  /api/v1/repository/{repo}/{tag}/download:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Download the tag to local
+        in: body
+        name: tag
+        required: true
+        schema:
+          $ref: '#/definitions/models.RepositoryTag'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "202":
+          description: Accepted
+          schema:
+            $ref: '#/definitions/models.RepositoryTag'
+        "500":
+          description: Internal Error
+          schema:
+            type: string
+      summary: 下载更新指定镜像仓库的指定tag到本地仓库
   /api/v1/repository/{repo}/tags:
     get:
       consumes:

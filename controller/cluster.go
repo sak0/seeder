@@ -12,7 +12,7 @@ type ClusterInfo struct {
 	Nodes 			[]*models.SeederNode		`json:"nodes"`
 }
 
-// @Summary 获取cloud-edge整体集群信息
+// @Summary 获取edge-cloud整体集群信息
 // @Accept  json
 // @Produce json
 // @Param page query int false "Page"

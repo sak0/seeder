@@ -23,3 +23,14 @@ func GetRepositoryTags(c *gin.Context) {
 	resp := Response{}
 	c.JSON(http.StatusOK, resp)
 }
+
+// @Summary 删除本地指定镜像仓库的指定tag
+// @Accept  json
+// @Produce json
+// @Success 202 {object} models.RepositoryTag
+// @Failure 500 {string} string "Internal Error"
+// @Router /api/v1/repository/{repo}/{tag} [delete]
+func DeleteRepositoryTag(c *gin.Context) {
+	resp := Response{}
+	c.JSON(http.StatusOK, resp)
+}
