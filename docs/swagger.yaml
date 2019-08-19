@@ -1,13 +1,80 @@
 basePath: /v1
 definitions:
-  controller.ClusterInfo:
+  models.ChartRepo:
     properties:
-      nodes:
-        items:
-          $ref: '#/definitions/controller.Node'
-        type: array
+      cached:
+        type: boolean
+      home:
+        type: string
+      icon:
+        type: string
+      latestVersion:
+        type: string
+      name:
+        type: string
+      verifyStatus:
+        type: string
+      versionCount:
+        type: integer
     type: object
-  controller.Node:
+  models.ChartVersion:
+    properties:
+      appVersion:
+        type: string
+      description:
+        type: string
+      digest:
+        type: string
+      name:
+        type: string
+      url:
+        type: string
+      version:
+        type: string
+    type: object
+  models.Repository:
+    properties:
+      cached:
+        type: boolean
+      description:
+        type: string
+      owner_name:
+        type: string
+      pull_count:
+        type: integer
+      repo_name:
+        type: string
+      star_count:
+        type: integer
+      tag_count:
+        type: integer
+      verify_status:
+        type: string
+    type: object
+  models.RepositoryTag:
+    properties:
+      architecture:
+        type: string
+      author:
+        type: string
+      cached:
+        type: boolean
+      digest:
+        type: string
+      dockerVersion:
+        type: string
+      os:
+        type: string
+      osversion:
+        type: string
+      size:
+        type: integer
+      tagName:
+        type: string
+      verifyStatus:
+        type: string
+    type: object
+  models.SeederNode:
     properties:
       advertise_addr:
         type: string
@@ -34,17 +101,92 @@ info:
   title: Swagger Example API
   version: "1.0"
 paths:
-  /api/v1/cluster:
+  /api/v1/chart:
     get:
       consumes:
       - application/json
+      parameters:
+      - description: Page
+        in: query
+        name: page
+        type: integer
+      - description: PageSize
+        in: query
+        name: pageSize
+        type: integer
+      - description: VerifyStatus
+        in: query
+        name: status
+        type: boolean
+      - description: Cached
+        in: query
+        name: cached
+        type: boolean
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/controller.ClusterInfo'
+            $ref: '#/definitions/models.ChartRepo'
+        "500":
+          description: Internal Error
+          schema:
+            type: string
+      summary: 获取Chart仓库列表
+  /api/v1/chart/{repo}/charts:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Page
+        in: query
+        name: page
+        type: integer
+      - description: PageSize
+        in: query
+        name: pageSize
+        type: integer
+      - description: VerifyStatus
+        in: query
+        name: status
+        type: boolean
+      - description: Cached
+        in: query
+        name: cached
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ChartVersion'
+        "500":
+          description: Internal Error
+          schema:
+            type: string
+      summary: 获取指定Chart仓库的版本列表
+  /api/v1/cluster:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Page
+        in: query
+        name: page
+        type: integer
+      - description: PageSize
+        in: query
+        name: pageSize
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SeederNode'
         "500":
           description: Internal Error
           schema:
@@ -52,20 +194,6 @@ paths:
       summary: 获取cloud-edge整体集群信息
   /api/v1/health:
     get:
-      parameters:
-      - description: Name
-        in: query
-        name: name
-        required: true
-        type: string
-      - description: State
-        in: query
-        name: state
-        type: integer
-      - description: CreatedBy
-        in: query
-        name: created_by
-        type: integer
       produces:
       - application/json
       responses:
@@ -74,4 +202,70 @@ paths:
           schema:
             type: string
       summary: 获取服务健康状态
+  /api/v1/repository:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Page
+        in: query
+        name: page
+        type: integer
+      - description: PageSize
+        in: query
+        name: pageSize
+        type: integer
+      - description: VerifyStatus
+        in: query
+        name: status
+        type: boolean
+      - description: Cached
+        in: query
+        name: cached
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Repository'
+        "500":
+          description: Internal Error
+          schema:
+            type: string
+      summary: 获取镜像仓库列表
+  /api/v1/repository/{repo}/tags:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Page
+        in: query
+        name: page
+        type: integer
+      - description: PageSize
+        in: query
+        name: pageSize
+        type: integer
+      - description: VerifyStatus
+        in: query
+        name: status
+        type: boolean
+      - description: Cached
+        in: query
+        name: cached
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.RepositoryTag'
+        "500":
+          description: Internal Error
+          schema:
+            type: string
+      summary: 获取单个镜像仓库的tag列表
 swagger: "2.0"

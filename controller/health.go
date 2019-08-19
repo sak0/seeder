@@ -18,9 +18,6 @@ type PageList struct {
 
 // @Summary 获取服务健康状态
 // @Produce  json
-// @Param name query string true "Name"
-// @Param state query int false "State"
-// @Param created_by query int false "CreatedBy"
 // @Success 200 {string} json "{"code":S200,"data":{},"msg":"ok"}"
 // @Router /api/v1/health [get]
 func HealthCheck(c *gin.Context) {

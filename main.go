@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"strconv"
 
 	"github.com/golang/glog"
@@ -10,10 +11,11 @@ import (
 	"github.com/swaggo/files"
 	"github.com/swaggo/gin-swagger"
 	_ "./docs"
+	_ "github.com/go-sql-driver/mysql"
 
 	"github.com/sak0/seeder/pkg/utils"
 	"github.com/sak0/seeder/controller"
-	"fmt"
+	"github.com/sak0/seeder/models"
 )
 
 const (
@@ -21,6 +23,23 @@ const (
 	PortIUse 	= 15000
 	healthURL   = "health"
 )
+
+var (
+	dbAddr 			string
+	dbName			string
+	dbUser			string
+	dbPassword		string
+	initDb			bool
+)
+
+func init() {
+	flag.StringVar(&dbAddr, "db-addr", "172.16.24.103:3306", "database connection url.")
+	flag.StringVar(&dbName, "db-name", "seeder", "database name to use.")
+	flag.StringVar(&dbUser, "db-user", "root", "database login name.")
+	flag.StringVar(&dbPassword, "db-password", "password", "database login password.")
+	flag.BoolVar(&initDb, "init-db", true, "if need init database.")
+	flag.Parse()
+}
 
 // @title Swagger Example API
 // @version 1.0
@@ -37,7 +56,10 @@ const (
 // @host seeder.cloudminds.com
 // @BasePath /v1
 func main() {
-	flag.Parse()
+	if err := models.InitDB(dbAddr, dbName, dbUser, dbPassword, initDb); err != nil {
+		glog.Fatalf("init db failed: %v", err)
+		return
+	}
 
 	if err := utils.ServiceRegister(WhoIAm, PortIUse, healthURL); err != nil {
 		glog.V(2).Infof("service register failed: %v", err)
@@ -58,15 +80,17 @@ func main() {
 		v1.GET(healthURL, controller.HealthCheck)
 		v1.GET("cluster", controller.GetCluster)
 
-		//accounts := v1.Group("/image")
-		//{
-		//	accounts.GET(":id", c.ShowAccount)
-		//	accounts.GET("", c.ListAccounts)
-		//	accounts.POST("", c.AddAccount)
-		//	accounts.DELETE(":id", c.DeleteAccount)
-		//	accounts.PATCH(":id", c.UpdateAccount)
-		//	accounts.POST(":id/images", c.UploadAccountImage)
-		//}
+		repository := v1.Group("/repository")
+		{
+			repository.GET("", controller.GetRepository)
+			repository.GET(":id/tags", controller.GetRepositoryTags)
+		}
+
+		chart := v1.Group("/chart")
+		{
+			chart.GET("", controller.GetChartRepo)
+			chart.GET(":id/charts", controller.GetChartVersion)
+		}
 	}
 
 	glog.Fatal(r.Run("0.0.0.0:" + strconv.Itoa(PortIUse)))

@@ -18,6 +18,108 @@
     "host": "seeder.cloudminds.com",
     "basePath": "/v1",
     "paths": {
+        "/api/v1/chart": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "获取Chart仓库列表",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Page",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "PageSize",
+                        "name": "pageSize",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "VerifyStatus",
+                        "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Cached",
+                        "name": "cached",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.ChartRepo"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/chart/{repo}/charts": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "获取指定Chart仓库的版本列表",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Page",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "PageSize",
+                        "name": "pageSize",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "VerifyStatus",
+                        "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Cached",
+                        "name": "cached",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.ChartVersion"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/cluster": {
             "get": {
                 "consumes": [
@@ -27,11 +129,25 @@
                     "application/json"
                 ],
                 "summary": "获取cloud-edge整体集群信息",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Page",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "PageSize",
+                        "name": "pageSize",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/controller.ClusterInfo"
+                            "$ref": "#/definitions/models.SeederNode"
                         }
                     },
                     "500": {
@@ -49,27 +165,6 @@
                     "application/json"
                 ],
                 "summary": "获取服务健康状态",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Name",
-                        "name": "name",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "State",
-                        "name": "state",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "CreatedBy",
-                        "name": "created_by",
-                        "in": "query"
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "{\"code\":S200,\"data\":{},\"msg\":\"ok\"}",
@@ -79,21 +174,225 @@
                     }
                 }
             }
-        }
-    },
-    "definitions": {
-        "controller.ClusterInfo": {
-            "type": "object",
-            "properties": {
-                "nodes": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/controller.Node"
+        },
+        "/api/v1/repository": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "获取镜像仓库列表",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Page",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "PageSize",
+                        "name": "pageSize",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "VerifyStatus",
+                        "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Cached",
+                        "name": "cached",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Repository"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Error",
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 }
             }
         },
-        "controller.Node": {
+        "/api/v1/repository/{repo}/tags": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "获取单个镜像仓库的tag列表",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Page",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "PageSize",
+                        "name": "pageSize",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "VerifyStatus",
+                        "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Cached",
+                        "name": "cached",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.RepositoryTag"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "models.ChartRepo": {
+            "type": "object",
+            "properties": {
+                "cached": {
+                    "type": "boolean"
+                },
+                "home": {
+                    "type": "string"
+                },
+                "icon": {
+                    "type": "string"
+                },
+                "latestVersion": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "verifyStatus": {
+                    "type": "string"
+                },
+                "versionCount": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.ChartVersion": {
+            "type": "object",
+            "properties": {
+                "appVersion": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "digest": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "url": {
+                    "type": "string"
+                },
+                "version": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.Repository": {
+            "type": "object",
+            "properties": {
+                "cached": {
+                    "type": "boolean"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "owner_name": {
+                    "type": "string"
+                },
+                "pull_count": {
+                    "type": "integer"
+                },
+                "repo_name": {
+                    "type": "string"
+                },
+                "star_count": {
+                    "type": "integer"
+                },
+                "tag_count": {
+                    "type": "integer"
+                },
+                "verify_status": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.RepositoryTag": {
+            "type": "object",
+            "properties": {
+                "architecture": {
+                    "type": "string"
+                },
+                "author": {
+                    "type": "string"
+                },
+                "cached": {
+                    "type": "boolean"
+                },
+                "digest": {
+                    "type": "string"
+                },
+                "dockerVersion": {
+                    "type": "string"
+                },
+                "os": {
+                    "type": "string"
+                },
+                "osversion": {
+                    "type": "string"
+                },
+                "size": {
+                    "type": "integer"
+                },
+                "tagName": {
+                    "type": "string"
+                },
+                "verifyStatus": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.SeederNode": {
             "type": "object",
             "properties": {
                 "advertise_addr": {
