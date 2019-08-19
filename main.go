@@ -56,6 +56,11 @@ func init() {
 // @host seeder.cloudminds.com
 // @BasePath /v1
 func main() {
+	myIp, err := utils.GetMyIpAddr()
+	if err != nil {
+		panic(err)
+	}
+
 	if err := models.InitDB(dbAddr, dbName, dbUser, dbPassword, initDb); err != nil {
 		glog.Fatalf("init db failed: %v", err)
 		return
@@ -72,7 +77,8 @@ func main() {
 	p.Use(r)
 	r.Use(gin.Recovery())
 
-	url := ginSwagger.URL(fmt.Sprintf("http://10.12.102.174:%d/swagger/doc.json", PortIUse)) // The url pointing to API definition
+
+	url := ginSwagger.URL(fmt.Sprintf("http://%s:%d/swagger/doc.json", myIp, PortIUse)) // The url pointing to API definition
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
 
 	v1 := r.Group("/api/v1")

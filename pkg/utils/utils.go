@@ -25,7 +25,7 @@ func ArrayIn(item string, arr []string) bool {
 	return false
 }
 
-func getMyIpAddr() (string, error) {
+func GetMyIpAddr() (string, error) {
 	ips, err := net.IntranetIP()
 	if err != nil {
 		return "", err
@@ -48,7 +48,7 @@ func ServiceRegister(myName string, myPort int, healthURL string) error {
 		return err
 	}
 
-	myIp, err := getMyIpAddr()
+	myIp, err := GetMyIpAddr()
 	if err != nil {
 		return err
 	}
