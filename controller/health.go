@@ -22,7 +22,7 @@ type PageList struct {
 // @Param state query int false "State"
 // @Param created_by query int false "CreatedBy"
 // @Success 200 {string} json "{"code":S200,"data":{},"msg":"ok"}"
-// @Router /health [get]
+// @Router /api/v1/health [get]
 func HealthCheck(c *gin.Context) {
 	resp := Response{
 		Code : "S200",

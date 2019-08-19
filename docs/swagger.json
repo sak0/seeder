@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "description": "This is a sample server Petstore server.",
+        "description": "Server for image/chart repo consistent.",
         "title": "Swagger Example API",
         "termsOfService": "http://swagger.io/terms/",
         "contact": {
@@ -15,39 +15,27 @@
         },
         "version": "1.0"
     },
-    "host": "petstore.swagger.io",
+    "host": "seeder.cloudminds.com",
     "basePath": "/v1",
     "paths": {
         "/api/v1/cluster": {
             "get": {
+                "consumes": [
+                    "application/json"
+                ],
                 "produces": [
                     "application/json"
                 ],
-                "summary": "获取seed集群信息",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Name",
-                        "name": "name",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "State",
-                        "name": "state",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "CreatedBy",
-                        "name": "created_by",
-                        "in": "query"
-                    }
-                ],
+                "summary": "获取cloud-edge整体集群信息",
                 "responses": {
                     "200": {
-                        "description": "{\"code\":S200,\"data\":{},\"msg\":\"ok\"}",
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controller.ClusterInfo"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Error",
                         "schema": {
                             "type": "string"
                         }
@@ -55,7 +43,7 @@
                 }
             }
         },
-        "/health": {
+        "/api/v1/health": {
             "get": {
                 "produces": [
                     "application/json"
@@ -89,6 +77,39 @@
                             "type": "string"
                         }
                     }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "controller.ClusterInfo": {
+            "type": "object",
+            "properties": {
+                "nodes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/controller.Node"
+                    }
+                }
+            }
+        },
+        "controller.Node": {
+            "type": "object",
+            "properties": {
+                "advertise_addr": {
+                    "type": "string"
+                },
+                "bind_addr": {
+                    "type": "string"
+                },
+                "node_name": {
+                    "type": "string"
+                },
+                "role": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
                 }
             }
         }

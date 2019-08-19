@@ -1,19 +1,19 @@
 package main
 
 import (
-		"flag"
+	"flag"
+	"strconv"
 
 	"github.com/golang/glog"
 	"github.com/gin-gonic/gin"
-		"github.com/swaggo/files"
+	"github.com/mcuadros/go-gin-prometheus"
+	"github.com/swaggo/files"
 	"github.com/swaggo/gin-swagger"
-	//_ "github.com/swaggo/gin-swagger/example/basic/docs"
 	_ "./docs"
 
 	"github.com/sak0/seeder/pkg/utils"
-	"github.com/mcuadros/go-gin-prometheus"
 	"github.com/sak0/seeder/controller"
-	"strconv"
+	"fmt"
 )
 
 const (
@@ -24,7 +24,7 @@ const (
 
 // @title Swagger Example API
 // @version 1.0
-// @description This is a sample server Petstore server.
+// @description Server for image/chart repo consistent.
 // @termsOfService http://swagger.io/terms/
 
 // @contact.name API Support
@@ -34,7 +34,7 @@ const (
 // @license.name Apache 2.0
 // @license.url http://www.apache.org/licenses/LICENSE-2.0.html
 
-// @host petstore.swagger.io
+// @host seeder.cloudminds.com
 // @BasePath /v1
 func main() {
 	flag.Parse()
@@ -48,13 +48,26 @@ func main() {
 
 	p := ginprometheus.NewPrometheus("gin")
 	p.Use(r)
-
 	r.Use(gin.Recovery())
-	r.GET(healthURL, controller.HealthCheck)
-	r.GET("api/v1/cluster", controller.GetCluster)
 
-	url := ginSwagger.URL("http://127.0.0.1:15000/swagger/doc.json") // The url pointing to API definition
+	url := ginSwagger.URL(fmt.Sprintf("http://127.0.0.1:%d/swagger/doc.json", PortIUse)) // The url pointing to API definition
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
+
+	v1 := r.Group("/api/v1")
+	{
+		v1.GET(healthURL, controller.HealthCheck)
+		v1.GET("cluster", controller.GetCluster)
+
+		//accounts := v1.Group("/image")
+		//{
+		//	accounts.GET(":id", c.ShowAccount)
+		//	accounts.GET("", c.ListAccounts)
+		//	accounts.POST("", c.AddAccount)
+		//	accounts.DELETE(":id", c.DeleteAccount)
+		//	accounts.PATCH(":id", c.UpdateAccount)
+		//	accounts.POST(":id/images", c.UploadAccountImage)
+		//}
+	}
 
 	glog.Fatal(r.Run("0.0.0.0:" + strconv.Itoa(PortIUse)))
 }

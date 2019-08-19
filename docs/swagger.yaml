@@ -1,11 +1,32 @@
 basePath: /v1
-host: petstore.swagger.io
+definitions:
+  controller.ClusterInfo:
+    properties:
+      nodes:
+        items:
+          $ref: '#/definitions/controller.Node'
+        type: array
+    type: object
+  controller.Node:
+    properties:
+      advertise_addr:
+        type: string
+      bind_addr:
+        type: string
+      node_name:
+        type: string
+      role:
+        type: string
+      status:
+        type: string
+    type: object
+host: seeder.cloudminds.com
 info:
   contact:
     email: support@swagger.io
     name: API Support
     url: http://www.swagger.io/support
-  description: This is a sample server Petstore server.
+  description: Server for image/chart repo consistent.
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
@@ -15,29 +36,21 @@ info:
 paths:
   /api/v1/cluster:
     get:
-      parameters:
-      - description: Name
-        in: query
-        name: name
-        required: true
-        type: string
-      - description: State
-        in: query
-        name: state
-        type: integer
-      - description: CreatedBy
-        in: query
-        name: created_by
-        type: integer
+      consumes:
+      - application/json
       produces:
       - application/json
       responses:
         "200":
-          description: '{"code":S200,"data":{},"msg":"ok"}'
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.ClusterInfo'
+        "500":
+          description: Internal Error
           schema:
             type: string
-      summary: 获取seed集群信息
-  /health:
+      summary: 获取cloud-edge整体集群信息
+  /api/v1/health:
     get:
       parameters:
       - description: Name

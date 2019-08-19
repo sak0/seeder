@@ -6,27 +6,30 @@ import (
 )
 
 type Node struct {
-	Addr 	string		`json:"addr"`
-	Role 	string		`json:"role"`
-	Status 	string		`json:"status"`
+	NodeName 			string   	`json:"node_name"`
+	AdvertiseAddr		string 		`json:"advertise_addr"`
+	BindAddr 			string		`json:"bind_addr"`
+	Role 				string		`json:"role"`
+	Status 				string		`json:"status"`
 }
 
 type ClusterInfo struct {
 	Nodes 	[]*Node		`json:"nodes"`
 }
 
-// @Summary 获取seed集群信息
-// @Produce  json
-// @Param name query string true "Name"
-// @Param state query int false "State"
-// @Param created_by query int false "CreatedBy"
-// @Success 200 {string} json "{"code":S200,"data":{},"msg":"ok"}"
+// @Summary 获取cloud-edge整体集群信息
+// @Accept  json
+// @Produce json
+// @Success 200 {object} controller.ClusterInfo
+// @Failure 500 {string} string "Internal Error"
 // @Router /api/v1/cluster [get]
 func GetCluster(c *gin.Context) {
 	cluster := &ClusterInfo{
 		Nodes : []*Node{
-			&Node{
-				Addr:"192.168.0.2",
+			{
+				NodeName:"center-node",
+				AdvertiseAddr:"10.23.100.2:15300",
+				BindAddr:"192.168.0.2:8080",
 				Role:"master",
 				Status:"active",
 			},
