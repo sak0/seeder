@@ -2,12 +2,13 @@ package cluster
 
 import (
 	"fmt"
-	"github.com/sak0/seeder/pkg/utils"
-	"github.com/golang/glog"
-	"github.com/sak0/memberlist"
 	"time"
 	"io/ioutil"
 	"strings"
+
+	"github.com/golang/glog"
+	"github.com/sak0/memberlist"
+	"github.com/sak0/seeder/pkg/utils"
 )
 
 const (
@@ -46,6 +47,7 @@ type SeederNode struct {
 	loopInterval 	time.Duration
 	mList  			*memberlist.Memberlist
 }
+
 func (n *SeederNode) Run() {
 	myDlg := &MyDelegate{}
 
@@ -73,7 +75,9 @@ func (n *SeederNode) doLoop() {
 	for _, node := range n.mList.Members() {
 		if strings.HasPrefix(node.Name, "master") {
 			master := node
-			n.mList.SendToTCP(master, []byte(fmt.Sprintf("hello I'm %s", n.Name)))
+			if master.Name != n.Name {
+				n.mList.SendToTCP(master, []byte(fmt.Sprintf("hello I'm %s", n.Name)))
+			}
 		}
 	}
 	glog.V(2).Infof("memberList: %v", n.mList.Members())

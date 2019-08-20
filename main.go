@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"strconv"
+	"time"
 
 	"github.com/golang/glog"
 	"github.com/gin-gonic/gin"
@@ -16,8 +17,8 @@ import (
 	"github.com/sak0/seeder/pkg/utils"
 	"github.com/sak0/seeder/controller"
 	"github.com/sak0/seeder/models"
-	"time"
 	"github.com/sak0/seeder/pkg/cluster"
+	"github.com/sak0/seeder/pkg/repoer"
 )
 
 const (
@@ -36,9 +37,11 @@ var (
 	initDb			bool
 	role 			string
 	master 			string
+	repoAddr		string
 )
 
 func init() {
+	flag.StringVar(&repoAddr, "repo-addr", "http://172.16.24.103", "addr for repo.")
 	flag.StringVar(&myName, "node-name", "edge-node-1", "seeder node name.")
 	flag.StringVar(&dbAddr, "db-addr", "172.16.24.103:3306", "database connection url.")
 	flag.StringVar(&dbName, "db-name", "seeder", "database name to use.")
@@ -91,6 +94,13 @@ func main() {
 			}
 		}
 	}()
+
+	repoWatcher, err := repoer.NewRepoWatcher(repoAddr, done)
+	if err != nil {
+		glog.Fatalf("watch repo %s failed: %v", repoAddr, err)
+		return
+	}
+	go repoWatcher.Run()
 
 	clusterSync := cluster.NewClusterSyncer(role, master, myName,"gossip", done)
 	go clusterSync.Run()
