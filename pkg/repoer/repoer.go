@@ -37,7 +37,16 @@ func (w *RepoWatcher) doLoop() {
 		glog.V(2).Infof("list repository failed: %v", errs)
 		return
 	}
-	glog.V(2).Infof("%+v", repos)
+	for _, repo := range repos {
+		tags, _, errs := w.client.Repositories.ListRepositoryTags(repo.Name)
+		if len(errs) > 0 {
+			glog.V(2).Infof("list repository tags failed: %v", errs)
+			continue
+		}
+		for _, tag := range tags {
+			glog.V(2).Infof("%s:%s", repo.Name, tag.Name)
+		}
+	}
 }
 
 func NewRepoWatcher(repoAddr string, stopCh chan interface{}) (*RepoWatcher, error){
