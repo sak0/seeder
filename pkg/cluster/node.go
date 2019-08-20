@@ -21,13 +21,13 @@ func (d *MyDelegate) NotifyMsg(msg []byte) {
 	glog.V(5).Infof("NotifyMsg: %v", string(msg))
 }
 func (d *MyDelegate) GetBroadcasts(overhead, limit int) [][]byte {
-	return [][]byte{[]byte("brdcast")}
+	return [][]byte{[]byte("get broadcast")}
 }
 func (d *MyDelegate) LocalState(join bool) []byte {
 	return []byte("local state")
 }
 func (d *MyDelegate) MergeRemoteState(buf []byte, join bool) {
-	glog.V(5).Infof("MergeRemoteState %v", buf)
+	glog.V(5).Infof("MergeRemoteState %s", buf)
 }
 
 type ClusterSyncer interface {
@@ -60,6 +60,7 @@ func (n *SeederNode) Run() {
 		panic(err)
 	}
 	n.mList = member
+	glog.V(2).Infof("node %s join master %s succeed.", n.Name, n.Master)
 
 	n.runSeederNode()
 }

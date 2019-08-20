@@ -44,7 +44,7 @@ func init() {
 	flag.StringVar(&dbName, "db-name", "seeder", "database name to use.")
 	flag.StringVar(&dbUser, "db-user", "root", "database login name.")
 	flag.StringVar(&dbPassword, "db-password", "password", "database login password.")
-	flag.StringVar(&role, "node-role", "follower", "seeder role.")
+	flag.StringVar(&role, "role", "follower", "seeder role.")
 	flag.StringVar(&master,"master-addr", "", "master addr")
 	flag.BoolVar(&initDb, "init-db", true, "if need init database.")
 	flag.Parse()
