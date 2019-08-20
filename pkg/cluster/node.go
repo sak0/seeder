@@ -21,7 +21,8 @@ func (d *MyDelegate) NotifyMsg(msg []byte) {
 	glog.V(5).Infof("NotifyMsg: %v", string(msg))
 }
 func (d *MyDelegate) GetBroadcasts(overhead, limit int) [][]byte {
-	return [][]byte{[]byte("get broadcast")}
+	//return [][]byte{[]byte("get broadcast")}
+	return nil
 }
 func (d *MyDelegate) LocalState(join bool) []byte {
 	return []byte("local state")
@@ -66,7 +67,7 @@ func (n *SeederNode) Run() {
 }
 
 func (n *SeederNode) doLoop() {
-	glog.V(2).Infof("%v", n.mList.Members())
+	glog.V(2).Infof("memberList: %v", n.mList.Members())
 }
 
 func (n *SeederNode) runSeederNode() {
