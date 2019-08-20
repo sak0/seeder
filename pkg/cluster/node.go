@@ -2,7 +2,7 @@ package cluster
 
 import (
 	"fmt"
-	"git.dev.yonghui.cn/ieyes/pajero/utils"
+	"github.com/sak0/seeder/pkg/utils"
 	"github.com/golang/glog"
 	"github.com/sak0/memberlist"
 	"time"
@@ -83,12 +83,12 @@ func (n *SeederNode) runSeederNode() {
 
 func newSeederNode(role, masterAddr, nodeName string, stopCh chan interface{}) *SeederNode {
 	if masterAddr == "" {
-		masterAddr = utils.GetMyIPAddr()
+		masterAddr = utils.MustGetMyIpAddr()
 	}
 
 	return &SeederNode{
 		Name:nodeName,
-		Addr: utils.GetMyIPAddr(),
+		Addr: utils.MustGetMyIpAddr(),
 		Role:role,
 		Master:masterAddr,
 		stop: stopCh,

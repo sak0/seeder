@@ -35,6 +35,14 @@ func GetMyIpAddr() (string, error) {
 	return ips[0], nil
 }
 
+func MustGetMyIpAddr() string {
+	ips, err := net.IntranetIP()
+	if err != nil {
+		panic(err)
+	}
+	return ips[0]
+}
+
 func ServiceRegister(myName string, myPort int, healthURL string) error {
 	consulAddr := os.Getenv("CONSUL_ADDR")
 	consulPort := os.Getenv("CONSUL_PORT")
