@@ -6,6 +6,8 @@ import (
 	"github.com/golang/glog"
 	"github.com/sak0/memberlist"
 	"time"
+	"io/ioutil"
+	"strings"
 )
 
 const (
@@ -51,6 +53,7 @@ func (n *SeederNode) Run() {
 	lanConfig.Name = n.Name
 	lanConfig.BindAddr = n.Addr
 	lanConfig.Delegate = myDlg
+	lanConfig.LogOutput = ioutil.Discard
 
 	member, err := memberlist.Create(lanConfig)
 	if err != nil {
@@ -67,6 +70,12 @@ func (n *SeederNode) Run() {
 }
 
 func (n *SeederNode) doLoop() {
+	for _, node := range n.mList.Members() {
+		if strings.HasPrefix(node.Name, "master") {
+			master := node
+			n.mList.SendToTCP(master, []byte(fmt.Sprintf("hello I'm %s", n.Name)))
+		}
+	}
 	glog.V(2).Infof("memberList: %v", n.mList.Members())
 }
 

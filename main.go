@@ -55,7 +55,7 @@ func init() {
 // @description Server for image/chart repo consistent.
 // @termsOfService
 
-// @contact.name Haozhi.Cui
+// @contact.name HaoZhi.Cui
 // @contact.url http://github.com/sak0
 // @contact.email 61755280@qq.com
 
