@@ -8,6 +8,8 @@ import (
 	"github.com/toolkits/net"
 	"github.com/golang/glog"
 	"github.com/hashicorp/consul/api"
+	"runtime"
+	"runtime/pprof"
 )
 
 const (
@@ -53,7 +55,8 @@ func ServiceRegister(myName string, myPort int, healthURL string) error {
 		return err
 	}
 
-	glog.V(2).Infof("Register %s:%s to consul %v", myIp, strconv.Itoa(myPort), consulConfig)
+	glog.V(2).Infof("Register %s:%s (health:%s)to consul %v",
+		myIp, strconv.Itoa(myPort), healthURL, consulConfig.Address)
 
 	myCheck := api.AgentServiceCheck{
 		DeregisterCriticalServiceAfter: DeregisterInterval,
@@ -70,4 +73,17 @@ func ServiceRegister(myName string, myPort int, healthURL string) error {
 		Check: &myCheck,
 	}
 	return client.Agent().ServiceRegister(&register)
+}
+
+func ConsumeMem() uint64 {
+	runtime.GC()
+	var memStats runtime.MemStats
+	runtime.ReadMemStats(&memStats)
+	return memStats.Sys
+}
+
+func DoResourceMonitor() {
+	m := pprof.Lookup("goroutine")
+	memStats := ConsumeMem()
+	glog.V(3).Infof("Resource monitor: [%d goroutines] [%.3f kb]", m.Count(), float64(memStats)/1e3)
 }

@@ -15,6 +15,9 @@ type SeederNode struct {
 	AdvertiseAddr		string 		`json:"advertise_addr" gorm:"type:varchar(50);column:advertise_addr"`
 	BindAddr 			string		`json:"bind_addr" gorm:"type:varchar(50);column:bind_addr"`
 	Role 				string		`json:"role" gorm:"type:varchar(50);column:role"`
+	ImageCount 			int			`json:"image_count" gorm:"type:int;column:image_count"`
+	ChartCount 			int			`json:"chart_count" gorm:"type:int;column:chart_count"`
+	PullCount 			int			`json:"pull_count" gorm:"type:int;column:pull_count"`
 	Status 				string		`json:"status" gorm:"type:varchar(50);column:status"`
 }
 func (s SeederNode) TableName() string {
@@ -68,12 +71,12 @@ func (c ChartRepo) TableName() string{
 }
 
 type ChartVersion struct {
-	Name 		string
-	Version 	string
-	Description	string
-	AppVersion 	string
-	Url 		string
-	Digest 		string
+	Name 		string			`json:"name" gorm:"type:varchar(50);column:name"`
+	Version 	string			`json:"version" gorm:"type:varchar(50);column:version"`
+	Description	string			`json:"description" gorm:"type:varchar(255);column:description"`
+	AppVersion 	string			`json:"app_version" gorm:"type:varchar(50);column:app_version"`
+	Url 		string			`json:"url" gorm:"type:varchar(50);column:url"`
+	Digest 		string			`json:"digest" gorm:"type:varchar(50);column:digest"`
 }
 func (c ChartVersion) TableName() string {
 	return "chart_version"

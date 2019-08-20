@@ -2,20 +2,19 @@
     "swagger": "2.0",
     "info": {
         "description": "Server for image/chart repo consistent.",
-        "title": "Swagger Example API",
-        "termsOfService": "http://swagger.io/terms/",
+        "title": "Seeder API",
         "contact": {
-            "name": "API Support",
-            "url": "http://www.swagger.io/support",
-            "email": "support@swagger.io"
+            "name": "Haozhi.Cui",
+            "url": "http://github.com/sak0",
+            "email": "61755280@qq.com"
         },
         "license": {
             "name": "Apache 2.0",
             "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
         },
-        "version": "1.0"
+        "version": "0.1"
     },
-    "host": "seeder.cloudminds.com",
+    "host": "seeder.pornhub.com",
     "basePath": "/v1",
     "paths": {
         "/api/v1/chart": {
@@ -435,7 +434,7 @@
         "models.ChartVersion": {
             "type": "object",
             "properties": {
-                "appVersion": {
+                "app_version": {
                     "type": "string"
                 },
                 "description": {
@@ -528,8 +527,17 @@
                 "bind_addr": {
                     "type": "string"
                 },
+                "chart_count": {
+                    "type": "integer"
+                },
+                "image_count": {
+                    "type": "integer"
+                },
                 "node_name": {
                     "type": "string"
+                },
+                "pull_count": {
+                    "type": "integer"
                 },
                 "role": {
                     "type": "string"

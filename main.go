@@ -16,44 +16,53 @@ import (
 	"github.com/sak0/seeder/pkg/utils"
 	"github.com/sak0/seeder/controller"
 	"github.com/sak0/seeder/models"
+	"time"
+	"github.com/sak0/seeder/pkg/cluster"
 )
 
 const (
 	WhoIAm 		= "seeder"
 	PortIUse 	= 15000
 	healthURL   = "health"
+	baseURL		= "/api/v1/"
 )
 
 var (
+	myName 			string
 	dbAddr 			string
 	dbName			string
 	dbUser			string
 	dbPassword		string
 	initDb			bool
+	role 			string
+	master 			string
 )
 
 func init() {
+	flag.StringVar(&myName, "node-name", "edge-node-1", "seeder node name.")
 	flag.StringVar(&dbAddr, "db-addr", "172.16.24.103:3306", "database connection url.")
 	flag.StringVar(&dbName, "db-name", "seeder", "database name to use.")
 	flag.StringVar(&dbUser, "db-user", "root", "database login name.")
 	flag.StringVar(&dbPassword, "db-password", "password", "database login password.")
+	flag.StringVar(&role, "node-role", "follower", "seeder role.")
+	flag.StringVar(&master,"master-addr", "", "master addr")
 	flag.BoolVar(&initDb, "init-db", true, "if need init database.")
 	flag.Parse()
 }
 
-// @title Swagger Example API
-// @version 1.0
+// @title Seeder API
+// @version 0.1
 // @description Server for image/chart repo consistent.
-// @termsOfService http://swagger.io/terms/
+// @termsOfService
 
-// @contact.name API Support
-// @contact.url http://www.swagger.io/support
-// @contact.email support@swagger.io
+// @contact.name Haozhi.Cui
+// @contact.url http://github.com/sak0
+// @contact.email 61755280@qq.com
 
 // @license.name Apache 2.0
 // @license.url http://www.apache.org/licenses/LICENSE-2.0.html
 
-// @host seeder.cloudminds.com
+// @host seeder.pornhub.com
 // @BasePath /v1
 func main() {
 	myIp, err := utils.GetMyIpAddr()
@@ -66,9 +75,25 @@ func main() {
 		return
 	}
 
-	if err := utils.ServiceRegister(WhoIAm, PortIUse, healthURL); err != nil {
+	if err := utils.ServiceRegister(WhoIAm, PortIUse, baseURL + healthURL); err != nil {
 		glog.V(2).Infof("service register failed: %v", err)
 	}
+
+	done := make(chan interface{})
+	defer close(done)
+	go func() {
+		for {
+			select {
+			case <-done:
+				return
+			case <-time.After(1 * time.Minute):
+				utils.DoResourceMonitor()
+			}
+		}
+	}()
+
+	clusterSync := cluster.NewClusterSyncer(role, master, myName,"gossip", done)
+	go clusterSync.Run()
 
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.New()
@@ -77,11 +102,10 @@ func main() {
 	p.Use(r)
 	r.Use(gin.Recovery())
 
-
 	url := ginSwagger.URL(fmt.Sprintf("http://%s:%d/swagger/doc.json", myIp, PortIUse)) // The url pointing to API definition
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
 
-	v1 := r.Group("/api/v1")
+	v1 := r.Group(baseURL)
 	{
 		v1.GET(healthURL, controller.HealthCheck)
 		v1.GET("cluster", controller.GetCluster)
