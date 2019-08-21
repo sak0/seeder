@@ -44,7 +44,23 @@ func (w *RepoWatcher) doLoop() {
 			continue
 		}
 		for _, tag := range tags {
-			glog.V(2).Infof("%s:%s", repo.Name, tag.Name)
+			glog.V(2).Infof("[IMAGE] %s:%s", repo.Name, tag.Name)
+		}
+	}
+
+	charts, _, errs := w.client.ChartRepos.ListChartRepositories(defaultProjectName)
+	if len(errs) > 0 {
+		glog.V(2).Infof("list chartRepos failed: %v", errs)
+		return
+	}
+	for _, chart := range charts {
+		versions, _, errs := w.client.ChartRepos.ListChartVersions(defaultProjectName, chart.Name)
+		if len(errs) > 0 {
+			glog.V(2).Infof("list chartRepos %s version failed: %v", chart.Name, errs)
+			continue
+		}
+		for _, version := range versions {
+			glog.V(2).Infof("[CHART] %s:%s", chart.Name, version.Version)
 		}
 	}
 }
