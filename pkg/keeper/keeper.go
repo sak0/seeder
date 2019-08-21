@@ -86,6 +86,9 @@ func (k *LocalKeeper) getLocalRepos() ([]*models.Repository, error) {
 
 func (k *LocalKeeper) addRepo(repository *models.Repository) {
 	glog.V(2).Infof("ADD REPO: %v", repository)
+	if err := models.CreateRepo(repository); err != nil {
+		glog.V(2).Infof("add repo failed: %v", err)
+	}
 }
 
 func (k *LocalKeeper) syncRepos() {

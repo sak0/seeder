@@ -16,3 +16,13 @@ func GetAllRepos(page, pageSize int) ([]*Repository, int, error) {
 
 	return repos, count, nil
 }
+
+func CreateRepo(repository *Repository) error {
+	glog.V(5).Infof("create repo item: %v", repository)
+
+	db := Db.Model(&Repository{})
+	if err := db.Create(repository).Error; err != nil {
+		return err
+	}
+	return nil
+}
