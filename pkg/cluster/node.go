@@ -30,7 +30,7 @@ func (d *MyDelegate) NotifyMsg(msg []byte) {
 		glog.V(2).Infof("receive invalid msg: %v", err)
 		return
 	}
-	d.unpdateInfo(d.syncer, repoInfo)
+	d.updateInfo(d.syncer, repoInfo)
 }
 func (d *MyDelegate) GetBroadcasts(overhead, limit int) [][]byte {
 	//return [][]byte{[]byte("get broadcast")}
@@ -42,7 +42,7 @@ func (d *MyDelegate) LocalState(join bool) []byte {
 func (d *MyDelegate) MergeRemoteState(buf []byte, join bool) {
 	glog.V(5).Infof("MergeRemoteState %s", buf)
 }
-func (d *MyDelegate) unpdateInfo(syncer ClusterSyncer, info repoer.ReporterInfo) {
+func (d *MyDelegate) updateInfo(syncer ClusterSyncer, info repoer.ReporterInfo) {
 	syncer.UpdateInfo(info)
 }
 
@@ -50,6 +50,8 @@ type ClusterSyncer interface {
 	Run()
 	RegisterReporter(watcher *repoer.RepoWatcher)
 	UpdateInfo(repoer.ReporterInfo)
+	GetInfoMap()map[string]repoer.ReporterInfo
+	GetNodes()map[string]string
 }
 
 type SeederNode struct {
@@ -61,11 +63,20 @@ type SeederNode struct {
 	loopInterval 	time.Duration
 	mList  			*memberlist.Memberlist
 	watcher 		*repoer.RepoWatcher
+	nodes           map[string]string
 	infoMap			map[string]repoer.ReporterInfo
 }
 
+func (n *SeederNode) GetInfoMap() map[string]repoer.ReporterInfo {
+	return n.infoMap
+}
+
+func (n *SeederNode) GetNodes() map[string]string {
+	return n.nodes
+}
+
 func (n *SeederNode) UpdateInfo(info repoer.ReporterInfo) {
-	n.infoMap[info.NodeRole] = info
+	n.infoMap[info.NodeName] = info
 }
 
 func (n *SeederNode) RegisterReporter(watcher *repoer.RepoWatcher) {
@@ -108,14 +119,19 @@ func (n *SeederNode) broadcastRepoInfo(info []byte) {
 }
 
 func (n *SeederNode) doLoop() {
+	nodes := make(map[string]string)
 	for _, node := range n.mList.Members() {
 		if strings.HasPrefix(node.Name, "master") {
+			nodes[node.Name] = "master"
 			master := node
 			if master.Name != n.Name {
 				n.mList.SendToTCP(master, []byte(fmt.Sprintf("hello I'm %s", n.Name)))
 			}
+		} else {
+			nodes[node.Name] = "follower"
 		}
 	}
+	n.nodes = nodes
 
 	glog.V(2).Infof("memberList: %v", n.mList.Members())
 	received := n.watcher.Report()
@@ -158,6 +174,8 @@ func newSeederNode(role, masterAddr, nodeName string, stopCh chan interface{}) *
 		Master:masterAddr,
 		stop: stopCh,
 		loopInterval: defaultLoopInterval,
+		infoMap:make(map[string]repoer.ReporterInfo),
+		nodes:make(map[string]string),
 	}
 }
 

@@ -17,8 +17,9 @@ import (
 	"github.com/sak0/seeder/pkg/utils"
 	"github.com/sak0/seeder/controller"
 	"github.com/sak0/seeder/models"
-	"github.com/sak0/seeder/pkg/cluster"
 	"github.com/sak0/seeder/pkg/repoer"
+	"github.com/sak0/seeder/pkg/cluster"
+	"github.com/sak0/seeder/pkg/keeper"
 )
 
 const (
@@ -95,16 +96,26 @@ func main() {
 		}
 	}()
 
-	repoWatcher, err := repoer.NewRepoWatcher(myName, role, repoAddr, done)
-	if err != nil {
-		glog.Fatalf("watch repo %s failed: %v", repoAddr, err)
-		return
-	}
-	go repoWatcher.Run()
+	// ***Run state machine here***
+	// repoWatcher: watch local repo/charts
+	// clusterSyncer: aggregate all nodes info
+	// localKeeper: sync cluster info to local database
+	{
+		repoWatcher, err := repoer.NewRepoWatcher(myName, role, repoAddr, done)
+		if err != nil {
+			glog.Fatalf("watch repo %s failed: %v", repoAddr, err)
+			return
+		}
+		go repoWatcher.Run()
 
-	clusterSync := cluster.NewClusterSyncer(role, master, myName,"gossip", done)
-	go clusterSync.Run()
-	clusterSync.RegisterReporter(repoWatcher)
+		clusterSync := cluster.NewClusterSyncer(role, master, myName,"gossip", done)
+		go clusterSync.Run()
+		clusterSync.RegisterReporter(repoWatcher)
+
+		localKeeper := keeper.NewLocalKeeper(role, master, myName, done)
+		go localKeeper.Run()
+		localKeeper.RegisterReporter(clusterSync)
+	}
 
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.New()
