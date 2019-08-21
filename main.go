@@ -95,7 +95,7 @@ func main() {
 		}
 	}()
 
-	repoWatcher, err := repoer.NewRepoWatcher(repoAddr, done)
+	repoWatcher, err := repoer.NewRepoWatcher(myName, role, repoAddr, done)
 	if err != nil {
 		glog.Fatalf("watch repo %s failed: %v", repoAddr, err)
 		return
@@ -104,6 +104,7 @@ func main() {
 
 	clusterSync := cluster.NewClusterSyncer(role, master, myName,"gossip", done)
 	go clusterSync.Run()
+	clusterSync.RegisterReporter(repoWatcher)
 
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.New()

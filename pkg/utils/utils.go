@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	DeregisterInterval 	= "2m"
+	DeRegisterInterval 	= "2m"
 	HealthCheckTimeout	= "10s"
 	HealthCheckInterval	= "15s"
 )
@@ -67,7 +67,7 @@ func ServiceRegister(myName string, myPort int, healthURL string) error {
 		myIp, strconv.Itoa(myPort), healthURL, consulConfig.Address)
 
 	myCheck := api.AgentServiceCheck{
-		DeregisterCriticalServiceAfter: DeregisterInterval,
+		DeregisterCriticalServiceAfter: DeRegisterInterval,
 		Timeout: HealthCheckTimeout,
 		Interval: HealthCheckInterval,
 		HTTP: fmt.Sprintf("http://%s:%s/%s", myIp, strconv.Itoa(myPort), healthURL),

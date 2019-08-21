@@ -1,14 +1,16 @@
 package cluster
 
 import (
+	"encoding/json"
 	"fmt"
-	"time"
 	"io/ioutil"
 	"strings"
+	"time"
 
 	"github.com/golang/glog"
 	"github.com/sak0/memberlist"
 	"github.com/sak0/seeder/pkg/utils"
+	"github.com/sak0/seeder/pkg/repoer"
 )
 
 const (
@@ -16,12 +18,19 @@ const (
 )
 
 type MyDelegate struct {
+	syncer 	ClusterSyncer
 }
 func (d *MyDelegate) NodeMeta(limit int) []byte {
 	return []byte("node meta")
 }
 func (d *MyDelegate) NotifyMsg(msg []byte) {
 	glog.V(5).Infof("NotifyMsg: %v", string(msg))
+	var repoInfo repoer.ReporterInfo
+	if err := json.Unmarshal(msg, &repoInfo); err != nil {
+		glog.V(2).Infof("receive invalid msg: %v", err)
+		return
+	}
+	d.unpdateInfo(d.syncer, repoInfo)
 }
 func (d *MyDelegate) GetBroadcasts(overhead, limit int) [][]byte {
 	//return [][]byte{[]byte("get broadcast")}
@@ -33,9 +42,14 @@ func (d *MyDelegate) LocalState(join bool) []byte {
 func (d *MyDelegate) MergeRemoteState(buf []byte, join bool) {
 	glog.V(5).Infof("MergeRemoteState %s", buf)
 }
+func (d *MyDelegate) unpdateInfo(syncer ClusterSyncer, info repoer.ReporterInfo) {
+	syncer.UpdateInfo(info)
+}
 
 type ClusterSyncer interface {
 	Run()
+	RegisterReporter(watcher *repoer.RepoWatcher)
+	UpdateInfo(repoer.ReporterInfo)
 }
 
 type SeederNode struct {
@@ -46,10 +60,22 @@ type SeederNode struct {
 	stop 			chan interface{}
 	loopInterval 	time.Duration
 	mList  			*memberlist.Memberlist
+	watcher 		*repoer.RepoWatcher
+	infoMap			map[string]repoer.ReporterInfo
+}
+
+func (n *SeederNode) UpdateInfo(info repoer.ReporterInfo) {
+	n.infoMap[info.NodeRole] = info
+}
+
+func (n *SeederNode) RegisterReporter(watcher *repoer.RepoWatcher) {
+	n.watcher = watcher
 }
 
 func (n *SeederNode) Run() {
-	myDlg := &MyDelegate{}
+	myDlg := &MyDelegate{
+		syncer:n,
+	}
 
 	lanConfig := memberlist.DefaultLANConfig()
 	lanConfig.Name = n.Name
@@ -71,6 +97,16 @@ func (n *SeederNode) Run() {
 	n.runSeederNode()
 }
 
+func (n *SeederNode) broadcastRepoInfo(info []byte) {
+	glog.V(5).Infof("master %s broadcast repo info to all nodes", n.Name)
+	for _, node := range n.mList.Members() {
+		if strings.HasPrefix(node.Name, "master") {
+			continue
+		}
+		n.mList.SendToTCP(node, info)
+	}
+}
+
 func (n *SeederNode) doLoop() {
 	for _, node := range n.mList.Members() {
 		if strings.HasPrefix(node.Name, "master") {
@@ -80,7 +116,21 @@ func (n *SeederNode) doLoop() {
 			}
 		}
 	}
+
 	glog.V(2).Infof("memberList: %v", n.mList.Members())
+	received := n.watcher.Report()
+	if received != nil {
+		var reportInfo repoer.ReporterInfo
+		err := json.Unmarshal(received, &reportInfo)
+		if err != nil {
+			glog.V(2).Infof("unmarshal reportInfo failed: %v", err)
+			return
+		}
+		glog.V(5).Infof("receive local report: %v", reportInfo)
+		if n.Role == "master" {
+			n.broadcastRepoInfo(received)
+		}
+	}
 }
 
 func (n *SeederNode) runSeederNode() {
