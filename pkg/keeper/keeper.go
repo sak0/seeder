@@ -14,6 +14,23 @@ const (
 	defaultKeepInterval	= 30 * time.Second
 )
 
+func formatVersions(masterInfo repoer.ReporterInfo) []*models.ChartVersion {
+	var versions []*models.ChartVersion
+	for _, chartVersion := range masterInfo.Versions {
+		version := &models.ChartVersion{
+			Name:chartVersion.Name,
+			Version:chartVersion.Version,
+			Description:chartVersion.Description,
+			AppVersion:chartVersion.AppVersion,
+			Url:chartVersion.Urls[0],
+			Digest:chartVersion.Digest,
+		}
+		versions = append(versions, version)
+	}
+
+	return versions
+}
+
 func formatCharts(masterInfo repoer.ReporterInfo) []*models.ChartRepo {
 	var charts []*models.ChartRepo
 	for _, chartRepo := range masterInfo.Charts {
@@ -68,6 +85,26 @@ func formatRepos(masterInfo repoer.ReporterInfo) []*models.Repository {
 		repos = append(repos, repo)
 	}
 	return repos
+}
+
+func diffVersions(remote, local []*models.ChartVersion) ([]*models.ChartVersion, []*models.ChartVersion, []*models.ChartVersion) {
+	var addVersions []*models.ChartVersion
+
+Loop:
+	for _, remoteVersion := range remote {
+		found := false
+		for _, localVersion := range local {
+			if remoteVersion.Name == localVersion.Name {
+				found = true
+				continue Loop
+			}
+		}
+		if !found {
+			addVersions = append(addVersions, remoteVersion)
+		}
+	}
+
+	return addVersions, nil, nil
 }
 
 func diffCharts(remote, local []*models.ChartRepo) ([]*models.ChartRepo, []*models.ChartRepo, []*models.ChartRepo) {
@@ -136,6 +173,14 @@ func (k *LocalKeeper) getMasterInfo() (repoer.ReporterInfo, error){
 	return masterInfo, nil
 }
 
+func (k *LocalKeeper) getLocalVersions() ([]*models.ChartVersion, error) {
+	versions, _, err := models.GetAllVersions(0, 0)
+	if err != nil {
+		return nil, err
+	}
+	return versions, nil
+}
+
 func (k *LocalKeeper) getLocalCharts() ([]*models.ChartRepo, error) {
 	charts, _, err := models.GetAllCharts(0, 0)
 	if err != nil {
@@ -159,6 +204,13 @@ func (k *LocalKeeper) getLocalRepos() ([]*models.Repository, error) {
 		return nil, err
 	}
 	return repos, nil
+}
+
+func (k *LocalKeeper) addVersion(version *models.ChartVersion) {
+	glog.V(2).Infof("ADD VERSION: %v", version)
+	if err := models.CreateVersion(version); err != nil {
+		glog.V(2).Infof("add version failed: %v", err)
+	}
 }
 
 func (k *LocalKeeper) addChart(chart *models.ChartRepo) {
@@ -208,11 +260,26 @@ func (k *LocalKeeper) syncCharts(masterInfo repoer.ReporterInfo) {
 		glog.V(2).Infof("get local charts failed: %v", err)
 		return
 	}
-	glog.V(2).Infof("[remoteCharts] %v", remoteCharts)
-	glog.V(2).Infof("[localCharts] %v", localCharts)
+	glog.V(5).Infof("[remoteCharts] %v", remoteCharts)
+	glog.V(5).Infof("[localCharts] %v", localCharts)
 	chartsAdd, _, _ := diffCharts(remoteCharts, localCharts)
 	for _, chartAdd := range chartsAdd {
 		k.addChart(chartAdd)
+	}
+}
+
+func (k *LocalKeeper) syncVersions(masterInfo repoer.ReporterInfo) {
+	remoteVersions := formatVersions(masterInfo)
+	localVersions, err := k.getLocalVersions()
+	if err != nil {
+		glog.V(2).Infof("get local charts failed: %v", err)
+		return
+	}
+	glog.V(2).Infof("[remoteVersions] %v", remoteVersions)
+	glog.V(2).Infof("[localVersions] %v", localVersions)
+	versionsAdd, _, _ := diffVersions(remoteVersions, localVersions)
+	for _, versionAdd := range versionsAdd {
+		k.addVersion(versionAdd)
 	}
 }
 
@@ -227,6 +294,7 @@ func (k *LocalKeeper) doSync() {
 		k.syncRepos(masterInfo)
 		k.syncTags(masterInfo)
 		k.syncCharts(masterInfo)
+		k.syncVersions(masterInfo)
 	}
 }
 
