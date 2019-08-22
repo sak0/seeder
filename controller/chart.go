@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strconv"
 	"github.com/sak0/seeder/models"
+	"github.com/golang/glog"
 )
 
 // @Summary 获取Chart仓库列表
@@ -55,6 +56,34 @@ func GetChartRepo(c *gin.Context) {
 // @Router /api/v1/chart/{repo}/charts [get]
 func GetChartVersion(c *gin.Context) {
 	resp := Response{}
+	chartName := c.Param("id")
+
+	if chartName == "" {
+		resp.Message = "must have chartRepo name"
+		resp.Code = "S400"
+		c.JSON(http.StatusOK, resp)
+	}
+	glog.V(5).Infof("ctr: get versions for chart %v", chartName)
+
+	page, _ := strconv.Atoi(c.Query("page"))
+	pageSize, _ := strconv.Atoi(c.Query("page_size"))
+
+	versions, count, err := models.GetVersionByChart(page, pageSize, chartName)
+	if err != nil {
+		resp.Message = "get versions failed."
+		resp.Data = err
+		resp.Code = "S400"
+		c.JSON(http.StatusOK, resp)
+		return
+	}
+
+	resp.Message = "get versions success."
+	resp.Data = PageList{
+		Total:count,
+		DataList:versions,
+	}
+	resp.Code = "S200"
+
 	c.JSON(http.StatusOK, resp)
 }
 

@@ -18,9 +18,14 @@ import (
 // @Router /api/v1/repository/{repo}/tags [get]
 func GetRepositoryTags(c *gin.Context) {
 	repo := c.Param("id")
+	resp := Response{}
+	if repo == "" {
+		resp.Message = "must have repo name"
+		resp.Code = "S400"
+		c.JSON(http.StatusOK, resp)
+	}
 	glog.V(5).Infof("ctr: get tags for repo %v", repo)
 
-	resp := Response{}
 	c.JSON(http.StatusOK, resp)
 }
 

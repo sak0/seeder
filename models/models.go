@@ -75,8 +75,8 @@ type ChartVersion struct {
 	Version 	string			`json:"version" gorm:"type:varchar(50);column:version"`
 	Description	string			`json:"description" gorm:"type:varchar(255);column:description"`
 	AppVersion 	string			`json:"app_version" gorm:"type:varchar(50);column:app_version"`
-	Url 		string			`json:"url" gorm:"type:varchar(50);column:url"`
-	Digest 		string			`json:"digest" gorm:"type:varchar(50);column:digest"`
+	Url 		string			`json:"url" gorm:"type:varchar(255);column:url"`
+	Digest 		string			`json:"digest" gorm:"type:varchar(255);column:digest"`
 }
 func (c ChartVersion) TableName() string {
 	return "chart_version"
