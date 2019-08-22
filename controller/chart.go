@@ -3,6 +3,8 @@ package controller
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"strconv"
+	"github.com/sak0/seeder/models"
 )
 
 // @Summary 获取Chart仓库列表
@@ -17,6 +19,26 @@ import (
 // @Router /api/v1/chart [get]
 func GetChartRepo(c *gin.Context) {
 	resp := Response{}
+
+	page, _ := strconv.Atoi(c.Query("page"))
+	pageSize, _ := strconv.Atoi(c.Query("page_size"))
+
+	charts, count, err := models.GetAllCharts(page, pageSize)
+	if err != nil {
+		resp.Message = "get chart failed."
+		resp.Data = err
+		resp.Code = "S400"
+		c.JSON(http.StatusOK, resp)
+		return
+	}
+
+	resp.Message = "get repos success."
+	resp.Data = PageList{
+		Total:count,
+		DataList:charts,
+	}
+	resp.Code = "S200"
+
 	c.JSON(http.StatusOK, resp)
 }
 

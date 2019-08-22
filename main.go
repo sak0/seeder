@@ -96,7 +96,7 @@ func main() {
 		}
 	}()
 
-	// ***Run state machine here***
+	// ***run state machine***
 	// repoWatcher: watch local repo/charts
 	// clusterSyncer: aggregate all nodes info
 	// localKeeper: sync cluster info to local database

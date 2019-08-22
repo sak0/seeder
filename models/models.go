@@ -45,7 +45,7 @@ type RepositoryTag struct {
 	TagName 		string		`json:"tag_name" gorm:"type:varchar(50);column:tag_name"`
 	Size 			int64		`json:"size" gorm:"type:int;column:size"`
 	Architecture 	string		`json:"architecture" gorm:"type:varchar(50);column:architecture"`
-	OS 				string		`json:"os" gorm:"type:varchar(50);column:tag_name"`
+	OS 				string		`json:"os" gorm:"type:varchar(50);column:os"`
 	OSVersion 		string		`json:"os_version" gorm:"type:varchar(50);column:os_version"`
 	DockerVersion 	string		`json:"docker_version" gorm:"type:varchar(50);column:docker_version"`
 	Author 			string		`json:"author" gorm:"type:varchar(50);column:author"`
@@ -83,7 +83,7 @@ func (c ChartVersion) TableName() string {
 }
 
 func initDBTables() {
-	tables := []interface{}{&SeederNode{}, &Repository{}, &ChartRepo{}, &ChartVersion{}}
+	tables := []interface{}{&SeederNode{}, &Repository{}, &RepositoryTag{}, &ChartRepo{}, &ChartVersion{}}
 	Db.DropTable(tables...)
 	Db.CreateTable(tables...)
 
@@ -139,7 +139,7 @@ func InitDB(DbAddr, DbName, User, Password string, needInitDb bool) error {
 		initDBTables()
 	}
 
-	Db.AutoMigrate(&SeederNode{}, &Repository{}, &ChartRepo{}, &ChartVersion{})
+	Db.AutoMigrate(&SeederNode{}, &Repository{}, &RepositoryTag{}, &ChartRepo{}, &ChartVersion{})
 	glog.V(2).Infof("InitDB(%s) spend %v", DbAddr, time.Since(start))
 
 	return nil
