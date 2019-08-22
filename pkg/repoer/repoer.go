@@ -9,7 +9,7 @@ import (
 
 const (
 	defaultWatchInterval 	= 10 * time.Second
-	defaultProjectName 		= "edge-cloud"
+	DefaultProjectName 		= "edge-cloud"
 )
 
 type ReporterInfo struct {
@@ -75,7 +75,7 @@ func (w *RepoWatcher) doLoop() {
 	}
 	w.info.Tags = totalTags
 
-	charts, _, errs := w.client.ChartRepos.ListChartRepositories(defaultProjectName)
+	charts, _, errs := w.client.ChartRepos.ListChartRepositories(DefaultProjectName)
 	if len(errs) > 0 {
 		glog.V(2).Infof("list chartRepos failed: %v", errs)
 		return
@@ -84,7 +84,7 @@ func (w *RepoWatcher) doLoop() {
 
 	var totalVersions []harbor.ChartVersionRecord
 	for _, chart := range charts {
-		versions, _, errs := w.client.ChartRepos.ListChartVersions(defaultProjectName, chart.Name)
+		versions, _, errs := w.client.ChartRepos.ListChartVersions(DefaultProjectName, chart.Name)
 		if len(errs) > 0 {
 			glog.V(2).Infof("list chartRepos %s version failed: %v", chart.Name, errs)
 			continue
@@ -99,7 +99,7 @@ func (w *RepoWatcher) doLoop() {
 
 func NewRepoWatcher(nodeName, nodeRole, repoAddr string, stopCh chan interface{}) (*RepoWatcher, error){
 	harborClient := harbor.NewClient(nil, repoAddr,"admin","Harbor12345")
-	opt := harbor.ListProjectsOptions{Name: defaultProjectName}
+	opt := harbor.ListProjectsOptions{Name: DefaultProjectName}
 	projects, _, errs := harborClient.Projects.ListProject(&opt)
 	if len(errs) > 0 {
 		return nil, errs[0]

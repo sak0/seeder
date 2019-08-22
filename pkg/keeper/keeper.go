@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/golang/glog"
+
 	"github.com/sak0/seeder/pkg/cluster"
 	"github.com/sak0/seeder/pkg/repoer"
-	"github.com/golang/glog"
 	"github.com/sak0/seeder/models"
 )
 
