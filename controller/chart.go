@@ -94,7 +94,7 @@ func GetChartVersion(c *gin.Context) {
 // @Success 202 {object} models.ChartVersion
 // @Failure 500 {string} string "Internal Error"
 // @Router /api/v1/chart/{repo}/{version}/download [post]
-func UpdateChartVersion(c *gin.Context) {
+func DownloadChartVersion(c *gin.Context) {
 	resp := Response{}
 	c.JSON(http.StatusOK, resp)
 }

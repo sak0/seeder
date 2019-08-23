@@ -144,7 +144,7 @@ func main() {
 		{
 			chart.GET("", controller.GetChartRepo)
 			chart.GET(":id/charts", controller.GetChartVersion)
-			chart.POST(":id/:version/download", controller.UpdateChartVersion)
+			chart.POST(":id/:version/download", controller.DownloadChartVersion)
 			chart.DELETE(":id/:version", controller.DeleteChartVersion)
 		}
 	}

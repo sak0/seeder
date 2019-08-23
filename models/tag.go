@@ -18,3 +18,14 @@ func GetAllTags(page, pageSize int) ([]*RepositoryTag, int, error) {
 
 	return tags, count, nil
 }
+
+
+func CreateTag(tag *RepositoryTag) error {
+	glog.V(5).Infof("create tag item: %v", tag)
+
+	db := Db.Model(&RepositoryTag{})
+	if err := db.Create(tag).Error; err != nil {
+		return err
+	}
+	return nil
+}

@@ -94,6 +94,26 @@ func formatRepos(masterInfo repoer.ReporterInfo) []*models.Repository {
 	return repos
 }
 
+func diffTags(remote, local []*models.RepositoryTag) ([]*models.RepositoryTag, []*models.RepositoryTag, []*models.RepositoryTag) {
+	var addTags []*models.RepositoryTag
+
+Loop:
+	for _, remoteTag := range remote {
+		found := false
+		for _, localTag := range local {
+			if remoteTag.TagName == localTag.TagName {
+				found = true
+				continue Loop
+			}
+		}
+		if !found {
+			addTags = append(addTags, remoteTag)
+		}
+	}
+
+	return addTags, nil, nil
+}
+
 func diffVersions(remote, local []*models.ChartVersion) ([]*models.ChartVersion, []*models.ChartVersion, []*models.ChartVersion) {
 	var addVersions []*models.ChartVersion
 Loop:
@@ -210,6 +230,13 @@ func (k *LocalKeeper) getLocalRepos() ([]*models.Repository, error) {
 	return repos, nil
 }
 
+func (k *LocalKeeper) addTag(tag *models.RepositoryTag) {
+	glog.V(2).Infof("ADD TAG: %v", tag)
+	if err := models.CreateTag(tag); err != nil {
+		glog.V(2).Infof("add tag failed: %v", err)
+	}
+}
+
 func (k *LocalKeeper) addVersion(version *models.ChartVersion) {
 	glog.V(2).Infof("ADD VERSION: %v", version)
 	if err := models.CreateVersion(version); err != nil {
@@ -253,8 +280,12 @@ func (k *LocalKeeper) syncTags(masterInfo repoer.ReporterInfo) {
 		glog.V(2).Infof("get local tags failed: %v", err)
 		return
 	}
-	glog.V(2).Infof("[remoteTags] %v", remoteTags)
-	glog.V(2).Infof("[localTags] %v", localTags)
+	glog.V(5).Infof("[remoteTags] %v", remoteTags)
+	glog.V(5).Infof("[localTags] %v", localTags)
+	tagsAdd, _, _ := diffTags(remoteTags, localTags)
+	for _, tagAdd := range tagsAdd {
+		k.addTag(tagAdd)
+	}
 }
 
 func (k *LocalKeeper) syncCharts(masterInfo repoer.ReporterInfo) {
@@ -279,8 +310,8 @@ func (k *LocalKeeper) syncVersions(masterInfo repoer.ReporterInfo) {
 		glog.V(2).Infof("get local charts failed: %v", err)
 		return
 	}
-	glog.V(2).Infof("[remoteVersions] %v", remoteVersions)
-	glog.V(2).Infof("[localVersions] %v", localVersions)
+	glog.V(5).Infof("[remoteVersions] %v", remoteVersions)
+	glog.V(5).Infof("[localVersions] %v", localVersions)
 	versionsAdd, _, _ := diffVersions(remoteVersions, localVersions)
 	for _, versionAdd := range versionsAdd {
 		k.addVersion(versionAdd)
