@@ -13,6 +13,7 @@ import (
 	"github.com/sak0/seeder/pkg/repoer"
 
 	common_http "github.com/sak0/seeder/pkg/common/http"
+	"github.com/golang/glog"
 )
 
 type Transfer struct {
@@ -159,6 +160,46 @@ func (t *Transfer) uploadChart(name, version string, chart io.Reader) error {
 	return nil
 }
 
+func (t *Transfer) copy(name, version string, override bool) error {
+	glog.V(2).Infof("copying %s:%s(source registry) to %s:%s(destination registry)...",
+		name, version, name, version)
+
+	// check the existence of the chart on the destination registry
+	//exist, err := t.ChartExist(name, version)
+	//if err != nil {
+	//	glog.V(2).Infof("failed to check the existence of chart %s:%s on the destination registry: %v", name, version, err)
+	//	return err
+	//}
+	//if exist {
+	//	// the same name chart exists, but not allowed to override
+	//	if !override {
+	//		glog.V(2).Infof("the same name chart %s:%s exists on the destination registry, but the \"override\" is set to false, skip",
+	//			name, version)
+	//		return nil
+	//	}
+	//	// the same name chart exists, but allowed to override
+	//	glog.V(2).Infof("the same name chart %s:%s exists on the destination registry and the \"override\" is set to true, continue...",
+	//		name, version)
+	//}
+
+	// copy the chart between the source and destination registries
+	chart, err := t.downloadChart(name, version)
+	if err != nil {
+		glog.Errorf("failed to download the chart %s:%s: %v", name, version, err)
+		return err
+	}
+	defer chart.Close()
+
+	if err = t.uploadChart(name, version, chart); err != nil {
+		glog.Errorf("failed to upload the chart %s:%s: %v", name, version, err)
+		return err
+	}
+
+	glog.V(2).Infof("copy %s:%s(source registry) to %s:%s(destination registry) completed",
+		name, version, name, version)
+
+	return nil
+}
 
 func mustHarborClient(repoAddr string)(*harbor.Client, error) {
 	client := harbor.NewClient(nil, repoAddr, "admin", "Harbor12345")
