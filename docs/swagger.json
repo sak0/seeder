@@ -437,6 +437,9 @@
                 "app_version": {
                     "type": "string"
                 },
+                "cached": {
+                    "type": "boolean"
+                },
                 "description": {
                     "type": "string"
                 },
@@ -447,6 +450,9 @@
                     "type": "string"
                 },
                 "url": {
+                    "type": "string"
+                },
+                "verify_status": {
                     "type": "string"
                 },
                 "version": {

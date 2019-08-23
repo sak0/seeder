@@ -23,6 +23,8 @@ definitions:
     properties:
       app_version:
         type: string
+      cached:
+        type: boolean
       description:
         type: string
       digest:
@@ -30,6 +32,8 @@ definitions:
       name:
         type: string
       url:
+        type: string
+      verify_status:
         type: string
       version:
         type: string
