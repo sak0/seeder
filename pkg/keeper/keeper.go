@@ -13,18 +13,24 @@ import (
 
 const (
 	defaultKeepInterval	= 30 * time.Second
+
+	verifyStatusTrue 	= "verified"
+	verifyStatusFalse 	= "unverified"
+	verifyStatusUnknown	= "unknown"
 )
 
 func formatVersions(masterInfo repoer.ReporterInfo) []*models.ChartVersion {
 	var versions []*models.ChartVersion
 	for _, chartVersion := range masterInfo.Versions {
-		version := &models.ChartVersion{
+		version := &models.ChartVersion {
 			Name:chartVersion.Name,
 			Version:chartVersion.Version,
 			Description:chartVersion.Description,
 			AppVersion:chartVersion.AppVersion,
 			Url:chartVersion.Urls[0],
 			Digest:chartVersion.Digest,
+			VerifyStatus:verifyStatusTrue,
+			Cached:true,
 		}
 		versions = append(versions, version)
 	}
@@ -42,7 +48,7 @@ func formatCharts(masterInfo repoer.ReporterInfo) []*models.ChartRepo {
 			LatestVersion:chartRepo.LatestVersion,
 			Icon:chartRepo.Icon,
 			Home:chartRepo.Home,
-			VerifyStatus:"verified",
+			VerifyStatus:verifyStatusTrue,
 			Cached:true,
 		}
 		charts = append(charts, chart)
@@ -62,7 +68,7 @@ func formatTags(masterInfo repoer.ReporterInfo) []*models.RepositoryTag {
 			OS:repoTag.OS,
 			DockerVersion:repoTag.DockerVersion,
 			Author:repoTag.Author,
-			VerifyStatus:"verified",
+			VerifyStatus:verifyStatusTrue,
 			Cached:true,
 		}
 		tags = append(tags, tag)
@@ -80,7 +86,7 @@ func formatRepos(masterInfo repoer.ReporterInfo) []*models.Repository {
 			Description: infoRepo.Description,
 			PullCount:infoRepo.PullCount,
 			StarCount:infoRepo.StarCount,
-			VerifyStatus:"verified",
+			VerifyStatus:verifyStatusTrue,
 			Cached:true,
 		}
 		repos = append(repos, repo)
@@ -90,7 +96,6 @@ func formatRepos(masterInfo repoer.ReporterInfo) []*models.Repository {
 
 func diffVersions(remote, local []*models.ChartVersion) ([]*models.ChartVersion, []*models.ChartVersion, []*models.ChartVersion) {
 	var addVersions []*models.ChartVersion
-
 Loop:
 	for _, remoteVersion := range remote {
 		found := false
@@ -110,7 +115,6 @@ Loop:
 
 func diffCharts(remote, local []*models.ChartRepo) ([]*models.ChartRepo, []*models.ChartRepo, []*models.ChartRepo) {
 	var addCharts []*models.ChartRepo
-
 Loop:
 	for _, remoteChart := range remote {
 		found := false
@@ -130,7 +134,6 @@ Loop:
 
 func diffRepos(remote, local []*models.Repository) ([]*models.Repository, []*models.Repository, []*models.Repository) {
 	var addRepos []*models.Repository
-
 Loop:
 	for _, remoteRepo := range remote {
 		found := false

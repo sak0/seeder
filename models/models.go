@@ -71,12 +71,14 @@ func (c ChartRepo) TableName() string{
 }
 
 type ChartVersion struct {
-	Name 		string			`json:"name" gorm:"type:varchar(50);column:name"`
-	Version 	string			`json:"version" gorm:"type:varchar(50);column:version"`
-	Description	string			`json:"description" gorm:"type:varchar(255);column:description"`
-	AppVersion 	string			`json:"app_version" gorm:"type:varchar(50);column:app_version"`
-	Url 		string			`json:"url" gorm:"type:varchar(255);column:url"`
-	Digest 		string			`json:"digest" gorm:"type:varchar(255);column:digest"`
+	Name 			string			`json:"name" gorm:"type:varchar(50);column:name"`
+	Version 		string			`json:"version" gorm:"type:varchar(50);column:version"`
+	Description		string			`json:"description" gorm:"type:varchar(255);column:description"`
+	AppVersion 		string			`json:"app_version" gorm:"type:varchar(50);column:app_version"`
+	Url 			string			`json:"url" gorm:"type:varchar(255);column:url"`
+	Digest 			string			`json:"digest" gorm:"type:varchar(255);column:digest"`
+	VerifyStatus 	string			`json:"verify_status" gorm:"type:varchar(50);column:verify_status"`
+	Cached 			bool			`json:"cached" gorm:"type:bool;column:cached"`
 }
 func (c ChartVersion) TableName() string {
 	return "chart_version"
