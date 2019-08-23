@@ -99,6 +99,19 @@ func DownloadChartVersion(c *gin.Context) {
 	c.JSON(http.StatusOK, resp)
 }
 
+
+// @Summary 推送指定Chart仓库的指定版本到远端仓库
+// @Accept  json
+// @Produce json
+// @Param remote query string true "EdgeNode"
+// @Success 202 {object} models.ChartVersion
+// @Failure 500 {string} string "Internal Error"
+// @Router /api/v1/chart/{repo}/{version}/push [post]
+func PushChartVersion(c *gin.Context) {
+	resp := Response{}
+	c.JSON(http.StatusOK, resp)
+}
+
 // @Summary 删除本地指定Chart仓库的指定版本
 // @Accept  json
 // @Produce json

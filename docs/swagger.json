@@ -181,6 +181,40 @@
                 }
             }
         },
+        "/api/v1/chart/{repo}/{version}/push": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "推送指定Chart仓库的指定版本到远端仓库",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "EdgeNode",
+                        "name": "remote",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "202": {
+                        "description": "Accepted",
+                        "schema": {
+                            "$ref": "#/definitions/models.ChartVersion"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/cluster": {
             "get": {
                 "consumes": [
