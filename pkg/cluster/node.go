@@ -17,12 +17,26 @@ const (
 	defaultLoopInterval = 10 * time.Second
 )
 
+type NodeMeta struct {
+	Name 	string
+	Role 	string
+	Addr 	string
+}
+
 type MyDelegate struct {
 	syncer 	ClusterSyncer
+	meta 	NodeMeta
 }
+
 func (d *MyDelegate) NodeMeta(limit int) []byte {
-	return []byte("node meta")
+	bytes, err := json.Marshal(&d.meta)
+	if err != nil {
+		glog.V(2).Infof("get node meta failed: %v", err)
+		return nil
+	}
+	return bytes
 }
+
 func (d *MyDelegate) NotifyMsg(msg []byte) {
 	glog.V(5).Infof("NotifyMsg: %v", string(msg))
 	var repoInfo repoer.ReporterInfo
@@ -32,16 +46,20 @@ func (d *MyDelegate) NotifyMsg(msg []byte) {
 	}
 	d.updateInfo(d.syncer, repoInfo)
 }
+
 func (d *MyDelegate) GetBroadcasts(overhead, limit int) [][]byte {
 	//return [][]byte{[]byte("get broadcast")}
 	return nil
 }
+
 func (d *MyDelegate) LocalState(join bool) []byte {
 	return []byte("local state")
 }
+
 func (d *MyDelegate) MergeRemoteState(buf []byte, join bool) {
 	glog.V(5).Infof("MergeRemoteState %s", buf)
 }
+
 func (d *MyDelegate) updateInfo(syncer ClusterSyncer, info repoer.ReporterInfo) {
 	syncer.UpdateInfo(info)
 }
@@ -86,6 +104,11 @@ func (n *SeederNode) RegisterReporter(watcher *repoer.RepoWatcher) {
 func (n *SeederNode) Run() {
 	myDlg := &MyDelegate{
 		syncer:n,
+		meta:NodeMeta{
+			Name: n.Name,
+			Role: n.Role,
+			Addr: n.Addr,
+		},
 	}
 
 	lanConfig := memberlist.DefaultLANConfig()
