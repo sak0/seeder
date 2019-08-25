@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"github.com/sak0/seeder/models"
 	"github.com/golang/glog"
+	"fmt"
 )
 
 // @Summary 获取Chart仓库列表
@@ -109,6 +110,29 @@ func DownloadChartVersion(c *gin.Context) {
 // @Router /api/v1/chart/{repo}/{version}/push [post]
 func PushChartVersion(c *gin.Context) {
 	resp := Response{}
+	chartName := c.Param("id")
+	version := c.Param("version")
+	if chartName == "" || version == "" {
+		resp.Code = "S400"
+		resp.Message = fmt.Sprintf("must have chartName and version.")
+		c.JSON(http.StatusOK, resp)
+	}
+
+	remoteNode := c.Query("remote")
+	if remoteNode == "" {
+		resp.Code = "S400"
+		resp.Message = fmt.Sprintf("must have remote node name.")
+		c.JSON(http.StatusOK, resp)
+	}
+
+	nodeInfo, err := models.GetNodeByName(remoteNode)
+	if err != nil {
+		resp.Code = "S400"
+		resp.Message = err.Error()
+		c.JSON(http.StatusOK, resp)
+	}
+	glog.V(2).Infof("prepare push version %s to remote node %v", version, nodeInfo)
+
 	c.JSON(http.StatusOK, resp)
 }
 
