@@ -1,12 +1,14 @@
 package controller
 
 import (
-	"github.com/gin-gonic/gin"
+	"fmt"
 	"net/http"
 	"strconv"
-	"github.com/sak0/seeder/models"
+
 	"github.com/golang/glog"
-	"fmt"
+	"github.com/gin-gonic/gin"
+
+	"github.com/sak0/seeder/models"
 )
 
 // @Summary 获取Chart仓库列表
