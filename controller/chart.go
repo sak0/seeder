@@ -37,7 +37,7 @@ func GetChartRepo(c *gin.Context) {
 		Total:count,
 		DataList:charts,
 	}
-	resp.Code = "S200"
+	resp.Code = "200"
 
 	c.JSON(http.StatusOK, resp)
 }
@@ -79,7 +79,7 @@ func GetChartVersion(c *gin.Context) {
 		Total:count,
 		DataList:versions,
 	}
-	resp.Code = "S200"
+	resp.Code = "200"
 
 	c.JSON(http.StatusOK, resp)
 }

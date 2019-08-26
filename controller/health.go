@@ -24,7 +24,7 @@ type PageList struct {
 // @Router /api/v1/health [get]
 func HealthCheck(c *gin.Context) {
 	resp := Response{
-		Code : "S200",
+		Code : "200",
 		Message : "health check pass.",
 	}
 

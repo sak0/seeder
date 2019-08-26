@@ -39,7 +39,7 @@ func GetCluster(c *gin.Context) {
 		Total:count,
 		DataList:nodes,
 	}
-	resp.Code = "S200"
+	resp.Code = "200"
 
 	c.JSON(http.StatusOK, resp)
 }
