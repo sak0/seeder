@@ -77,6 +77,7 @@ type SeederNode struct {
 	Addr 			string
 	Role 			string
 	Master 			string
+	RepoAddr 		string
 	stop 			chan interface{}
 	loopInterval 	time.Duration
 	mList  			*memberlist.Memberlist
@@ -156,7 +157,17 @@ func (n *SeederNode) doLoop() {
 	}
 	n.nodes = nodes
 
-	glog.V(2).Infof("memberList: %v", n.mList.Members())
+	members := n.mList.Members()
+	for _, member := range members {
+		var meta NodeMeta
+		err := json.Unmarshal(member.Meta, &meta)
+		if err != nil {
+			glog.V(2).Infof("can not marshal node %s meta", member.Name)
+			continue
+		}
+		glog.V(2).Infof("[%s-%s] %v", member.Name, member.Addr, meta)
+	}
+
 	received := n.watcher.Report()
 	if received != nil {
 		var reportInfo repoer.ReporterInfo
@@ -185,7 +196,7 @@ func (n *SeederNode) runSeederNode() {
 	}
 }
 
-func newSeederNode(role, masterAddr, nodeName string, stopCh chan interface{}) *SeederNode {
+func newSeederNode(role, masterAddr, nodeName, repoAddr string, stopCh chan interface{}) *SeederNode {
 	if masterAddr == "" {
 		masterAddr = utils.MustGetMyIpAddr()
 	}
@@ -194,6 +205,7 @@ func newSeederNode(role, masterAddr, nodeName string, stopCh chan interface{}) *
 		Name:nodeName,
 		Addr: utils.MustGetMyIpAddr(),
 		Role:role,
+		RepoAddr:repoAddr,
 		Master:masterAddr,
 		stop: stopCh,
 		loopInterval: defaultLoopInterval,
@@ -202,10 +214,10 @@ func newSeederNode(role, masterAddr, nodeName string, stopCh chan interface{}) *
 	}
 }
 
-func NewClusterSyncer(role, masterAddr, nodeName, syncMode string, stopCh chan interface{}) ClusterSyncer {
+func NewClusterSyncer(role, masterAddr, nodeName, repoAddr, syncMode string, stopCh chan interface{}) ClusterSyncer {
 	switch syncMode {
 	case "gossip":
-		syncer := newSeederNode(role, masterAddr, nodeName, stopCh)
+		syncer := newSeederNode(role, masterAddr, nodeName, repoAddr, stopCh)
 		return syncer
 	default:
 		panic(fmt.Sprintf("unsupport syncer mode: %s", syncMode))

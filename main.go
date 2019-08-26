@@ -108,7 +108,7 @@ func main() {
 		}
 		go repoWatcher.Run()
 
-		clusterSync := cluster.NewClusterSyncer(role, master, myName,"gossip", done)
+		clusterSync := cluster.NewClusterSyncer(role, master, myName, repoAddr, "gossip", done)
 		go clusterSync.Run()
 		clusterSync.RegisterReporter(repoWatcher)
 

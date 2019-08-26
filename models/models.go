@@ -14,6 +14,7 @@ type SeederNode struct {
 	NodeName 			string   	`json:"node_name" gorm:"type:varchar(50);column:node_name"`
 	AdvertiseAddr		string 		`json:"advertise_addr" gorm:"type:varchar(50);column:advertise_addr"`
 	BindAddr 			string		`json:"bind_addr" gorm:"type:varchar(50);column:bind_addr"`
+	RepoAddr 			string 		`json:"bind_addr" gorm:"type:varchar(50);column:repo_addr"`
 	Role 				string		`json:"role" gorm:"type:varchar(50);column:role"`
 	ImageCount 			int			`json:"image_count" gorm:"type:int;column:image_count"`
 	ChartCount 			int			`json:"chart_count" gorm:"type:int;column:chart_count"`
@@ -91,9 +92,10 @@ func initDBTables() {
 
 	Db = Db.Model(&SeederNode{})
 	node1 := SeederNode{
-		NodeName:"center-node",
+		NodeName:"master200",
 		AdvertiseAddr:"10.23.100.2:15300",
-		BindAddr:"192.168.0.2:8080",
+		BindAddr:"172.16.24.200",
+		RepoAddr:"http://172.16.24.103",
 		Role:"master",
 		Status:"active",
 	}
@@ -102,9 +104,10 @@ func initDBTables() {
 	}
 
 	node2 := SeederNode{
-		NodeName:"edge-node",
+		NodeName:"edge-node-pc",
 		AdvertiseAddr:"10.23.100.3:15300",
-		BindAddr:"192.168.0.2:8080",
+		BindAddr:"10.12.102.181",
+		RepoAddr:"http://172.16.24.102",
 		Role:"follower",
 		Status:"active",
 	}
@@ -113,7 +116,7 @@ func initDBTables() {
 	}
 
 	node3 := SeederNode{
-		NodeName:"edge-node",
+		NodeName:"edge-node-2",
 		AdvertiseAddr:"10.23.100.4:15300",
 		BindAddr:"192.168.0.2:8080",
 		Role:"follower",
