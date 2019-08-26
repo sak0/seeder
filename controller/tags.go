@@ -20,9 +20,8 @@ func GetRepositoryTags(c *gin.Context) {
 	repo := c.Param("id")
 	resp := Response{}
 	if repo == "" {
-		resp.Message = "must have repo name"
-		resp.Code = "S400"
-		c.JSON(http.StatusOK, resp)
+		RespErr(ERRBADREQUEST, ERROR_INVALID_PARAMS, "must have repo name", c)
+		return
 	}
 	glog.V(5).Infof("ctr: get tags for repo %v", repo)
 

@@ -1,8 +1,7 @@
 package controller
 
 import (
-	"fmt"
-	"net/http"
+		"net/http"
 	"strconv"
 
 	"github.com/golang/glog"
@@ -29,10 +28,7 @@ func GetChartRepo(c *gin.Context) {
 
 	charts, count, err := models.GetAllCharts(page, pageSize)
 	if err != nil {
-		resp.Message = "get chart failed."
-		resp.Data = err
-		resp.Code = "S400"
-		c.JSON(http.StatusOK, resp)
+		RespErr(ERRBADREQUEST, ERROR_INVALID_PARAMS, "get chart failed.", c)
 		return
 	}
 
@@ -62,9 +58,8 @@ func GetChartVersion(c *gin.Context) {
 	chartName := c.Param("id")
 
 	if chartName == "" {
-		resp.Message = "must have chartRepo name"
-		resp.Code = "S400"
-		c.JSON(http.StatusOK, resp)
+		RespErr(ERRBADREQUEST, ERROR_INVALID_PARAMS, "must have chartRepo name", c)
+		return
 	}
 	glog.V(5).Infof("ctr: get versions for chart %v", chartName)
 
@@ -73,10 +68,7 @@ func GetChartVersion(c *gin.Context) {
 
 	versions, count, err := models.GetVersionByChart(page, pageSize, chartName)
 	if err != nil {
-		resp.Message = "get versions failed."
-		resp.Data = err
-		resp.Code = "S400"
-		c.JSON(http.StatusOK, resp)
+		RespErr(ERRINTERNALERR, ERROR_INVALID_PARAMS, "get version failed", c)
 		return
 	}
 
@@ -117,24 +109,22 @@ func PushChartVersion(c *gin.Context) {
 	chartName := c.Param("id")
 	version := c.Param("version")
 	if chartName == "" || version == "" {
-		resp.Code = "S400"
-		resp.Message = fmt.Sprintf("must have chartName and version.")
-		c.JSON(http.StatusOK, resp)
+		RespErr(ERRBADREQUEST, ERROR_INVALID_PARAMS, "must have chartName and version.", c)
+		return
 	}
 
 	remoteNode := c.Query("remote")
 	if remoteNode == "" {
-		resp.Code = "S400"
-		resp.Message = fmt.Sprintf("must have remote node name.")
-		c.JSON(http.StatusOK, resp)
+		RespErr(ERRBADREQUEST, ERROR_INVALID_PARAMS, "must have remote node name.", c)
+		return
 	}
 
 	nodeInfo, err := models.GetNodeByName(remoteNode)
 	if err != nil {
-		resp.Code = "S400"
-		resp.Message = err.Error()
-		c.JSON(http.StatusOK, resp)
+		RespErr(ERRINTERNALERR, ERROR_INVALID_PARAMS, err.Error(), c)
+		return
 	}
+
 	glog.V(2).Infof("prepare push version %s to remote node %v", version, nodeInfo)
 
 	c.JSON(http.StatusOK, resp)

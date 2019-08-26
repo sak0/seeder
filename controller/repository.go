@@ -25,10 +25,7 @@ func GetRepository(c *gin.Context) {
 
 	repos, count, err := models.GetAllRepos(page, pageSize)
 	if err != nil {
-		resp.Message = "get repo failed."
-		resp.Data = err
-		resp.Code = "S400"
-		c.JSON(http.StatusOK, resp)
+		RespErr(ERRINTERNALERR, ERROR_INVALID_PARAMS, "get repo failed.", c)
 		return
 	}
 

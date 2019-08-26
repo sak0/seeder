@@ -28,10 +28,7 @@ func GetCluster(c *gin.Context) {
 
 	nodes, count, err := models.GetSeederNodes(page, pageSize)
 	if err != nil {
-		resp.Message = "get cluster info failed."
-		resp.Data = err
-		resp.Code = "S400"
-		c.JSON(http.StatusOK, resp)
+		RespErr(ERRINTERNALERR, ERROR_INVALID_PARAMS, "get cluster info failed.", c)
 		return
 	}
 

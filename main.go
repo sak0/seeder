@@ -124,6 +124,8 @@ func main() {
 	p.Use(r)
 	r.Use(gin.Recovery())
 
+	r.Use(controller.RequestIdMiddleware())
+
 	url := ginSwagger.URL(fmt.Sprintf("http://%s:%d/swagger/doc.json", myIp, PortIUse)) // The url pointing to API definition
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
 
