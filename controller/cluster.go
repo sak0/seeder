@@ -37,6 +37,8 @@ func GetCluster(c *gin.Context) {
 
 	resp.Message = "get cluster info success."
 	resp.Data = PageList{
+		Offset:page,
+		Size:pageSize,
 		Total:count,
 		DataList:nodes,
 	}

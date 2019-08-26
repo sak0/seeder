@@ -82,6 +82,8 @@ func GetChartVersion(c *gin.Context) {
 
 	resp.Message = "get versions success."
 	resp.Data = PageList{
+		Offset:page,
+		Size:pageSize,
 		Total:count,
 		DataList:versions,
 	}

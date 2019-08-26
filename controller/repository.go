@@ -34,6 +34,8 @@ func GetRepository(c *gin.Context) {
 
 	resp.Message = "get repos success."
 	resp.Data = PageList{
+		Offset:page,
+		Size:pageSize,
 		Total:count,
 		DataList:repos,
 	}

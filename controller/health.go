@@ -12,6 +12,8 @@ type Response struct {
 }
 
 type PageList struct {
+	Size 		int 		`json:"size"`
+	Offset 		int 		`json:"offset"`
 	Total 		int 		`json:"total"`
 	DataList 	interface{}	`json:"list"`
 }
