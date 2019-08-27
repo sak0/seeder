@@ -1,4 +1,4 @@
-basePath: /v1
+basePath: /
 definitions:
   models.ChartRepo:
     properties:
@@ -99,7 +99,7 @@ definitions:
       status:
         type: string
     type: object
-host: seeder.pornhub.com
+host: 172.16.24.200:15000
 info:
   contact:
     email: 61755280@qq.com
