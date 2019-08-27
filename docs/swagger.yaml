@@ -133,6 +133,10 @@ paths:
         in: query
         name: cached
         type: boolean
+      - description: ClusterName
+        in: query
+        name: cluster
+        type: boolean
       produces:
       - application/json
       responses:
@@ -227,6 +231,10 @@ paths:
       - description: Cached
         in: query
         name: cached
+        type: boolean
+      - description: ClusterName
+        in: query
+        name: cluster
         type: boolean
       produces:
       - application/json

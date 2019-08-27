@@ -50,6 +50,12 @@
                         "description": "Cached",
                         "name": "cached",
                         "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "ClusterName",
+                        "name": "cluster",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -100,6 +106,12 @@
                         "type": "boolean",
                         "description": "Cached",
                         "name": "cached",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "ClusterName",
+                        "name": "cluster",
                         "in": "query"
                     }
                 ],
