@@ -1,13 +1,15 @@
 package controller
 
 import (
-		"net/http"
+	"net/http"
 	"strconv"
 
 	"github.com/golang/glog"
 	"github.com/gin-gonic/gin"
 
 	"github.com/sak0/seeder/models"
+	"github.com/sak0/seeder/pkg/utils"
+	"fmt"
 )
 
 // @Summary 获取Chart仓库列表
@@ -17,29 +19,59 @@ import (
 // @Param pageSize query int false "PageSize"
 // @Param status query bool false "VerifyStatus"
 // @Param cached query bool false "Cached"
+// @Param cluster query bool false "ClusterName"
 // @Success 200 {object} models.ChartRepo
 // @Failure 500 {string} string "Internal Error"
 // @Router /api/v1/chart [get]
 func GetChartRepo(c *gin.Context) {
 	resp := Response{}
 
+	clusterName := c.Query("cluster_name")
+	glog.V(2).Infof("get chart for remote cluster: %s", clusterName)
+
 	page, _ := strconv.Atoi(c.Query("page"))
 	pageSize, _ := strconv.Atoi(c.Query("page_size"))
 
-	charts, count, err := models.GetAllCharts(page, pageSize)
-	if err != nil {
-		RespErr(ERRBADREQUEST, ERROR_INVALID_PARAMS, "get chart failed.", c)
-		return
-	}
+	if clusterName == "" {
+		charts, count, err := models.GetAllCharts(page, pageSize)
+		if err != nil {
+			RespErr(ERRBADREQUEST, ERROR_INVALID_PARAMS, "get chart failed.", c)
+			return
+		}
 
-	resp.Message = "get repos success."
-	resp.Data = PageList{
-		Total:count,
-		DataList:charts,
-	}
-	resp.Code = "200"
+		resp.Message = "get repos success."
+		resp.Data = PageList{
+			Total:count,
+			DataList:charts,
+		}
+		resp.Code = "200"
 
-	c.JSON(http.StatusOK, resp)
+		c.JSON(http.StatusOK, resp)
+	} else {
+		node, err := models.GetNodeByName(clusterName)
+		if err != nil {
+			glog.V(2).Infof("get node %s info failed: %v", clusterName, node)
+			RespErr(ERRBADREQUEST, ERROR_INVALID_PARAMS, err.Error(), c)
+			return
+		}
+
+		client := http.Client{
+			Transport:utils.GetHTTPTransport(true),
+		}
+		url := fmt.Sprintf("http://%s/api/v1/chart", node.AdvertiseAddr)
+		req, err := http.NewRequest(http.MethodGet, url, nil)
+		if err != nil {
+			RespErr(ERRINTERNALERR, ERROR_INVALID_PARAMS, err.Error(), c)
+			return
+		}
+
+		remoteResp, err := client.Do(req)
+		if err != nil {
+			RespErr(ERRINTERNALERR, ERROR_INVALID_PARAMS, err.Error(), c)
+			return
+		}
+		c.JSON(http.StatusOK, remoteResp)
+	}
 }
 
 
@@ -50,6 +82,7 @@ func GetChartRepo(c *gin.Context) {
 // @Param pageSize query int false "PageSize"
 // @Param status query bool false "VerifyStatus"
 // @Param cached query bool false "Cached"
+// @Param cluster query bool false "ClusterName"
 // @Success 200 {object} models.ChartVersion
 // @Failure 500 {string} string "Internal Error"
 // @Router /api/v1/chart/{repo}/charts [get]
@@ -65,6 +98,9 @@ func GetChartVersion(c *gin.Context) {
 
 	page, _ := strconv.Atoi(c.Query("page"))
 	pageSize, _ := strconv.Atoi(c.Query("page_size"))
+
+	clusterName := c.Query("cluster_name")
+	glog.V(2).Infof("get version for remote cluster: %s", clusterName)
 
 	versions, count, err := models.GetVersionByChart(page, pageSize, chartName)
 	if err != nil {

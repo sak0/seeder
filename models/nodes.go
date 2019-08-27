@@ -5,6 +5,15 @@ import (
 	"fmt"
 )
 
+const (
+	RoleMaster 				= "master"
+	RoleFollower 			= "follower"
+
+	NodeStatusActive 		= "active"
+	NodeStatusUnknown		= "unknown"
+	NodeStatusDown 			= "down"
+)
+
 func GetNodeByName(name string) (*SeederNode, error) {
 	var count int
 	var node SeederNode

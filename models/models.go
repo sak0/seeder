@@ -11,7 +11,7 @@ var Db *gorm.DB
 
 type SeederNode struct {
 	gorm.Model
-	NodeName 			string   	`json:"node_name" gorm:"type:varchar(50);column:node_name"`
+	ClusterName 		string   	`json:"node_name" gorm:"type:varchar(50);column:cluster_name"`
 	AdvertiseAddr		string 		`json:"advertise_addr" gorm:"type:varchar(50);column:advertise_addr"`
 	BindAddr 			string		`json:"bind_addr" gorm:"type:varchar(50);column:bind_addr"`
 	RepoAddr 			string 		`json:"bind_addr" gorm:"type:varchar(50);column:repo_addr"`
@@ -21,6 +21,7 @@ type SeederNode struct {
 	PullCount 			int			`json:"pull_count" gorm:"type:int;column:pull_count"`
 	Status 				string		`json:"status" gorm:"type:varchar(50);column:status"`
 }
+
 func (s SeederNode) TableName() string {
 	return "seeder_node"
 }
@@ -36,6 +37,7 @@ type Repository struct {
 	VerifyStatus 	string		`json:"verify_status" gorm:"type:varchar(50);column:verify_status"`
 	Cached 			bool		`json:"cached" gorm:"type:bool;column:cached"`
 }
+
 func (s Repository) TableName() string {
 	return "repository"
 }
@@ -53,6 +55,7 @@ type RepositoryTag struct {
 	VerifyStatus 	string		`json:"verify_status" gorm:"type:varchar(50);column:verify_status"`
 	Cached 			bool		`json:"cached" gorm:"type:bool;column:cached"`
 }
+
 func (t RepositoryTag) TableName() string {
 	return "repository_tag"
 }
@@ -67,6 +70,7 @@ type ChartRepo struct {
 	VerifyStatus 	string		`json:"verify_status" gorm:"type:varchar(50);column:verify_status"`
 	Cached 			bool		`json:"cached" gorm:"type:bool;column:cached"`
 }
+
 func (c ChartRepo) TableName() string{
 	return "chart_repo"
 }
@@ -81,6 +85,7 @@ type ChartVersion struct {
 	VerifyStatus 	string			`json:"verify_status" gorm:"type:varchar(50);column:verify_status"`
 	Cached 			bool			`json:"cached" gorm:"type:bool;column:cached"`
 }
+
 func (c ChartVersion) TableName() string {
 	return "chart_version"
 }
@@ -92,35 +97,35 @@ func initDBTables() {
 
 	Db = Db.Model(&SeederNode{})
 	node1 := SeederNode{
-		NodeName:"master200",
+		ClusterName:"master200",
 		AdvertiseAddr:"10.23.100.2:15300",
 		BindAddr:"172.16.24.200",
 		RepoAddr:"http://172.16.24.103",
-		Role:"master",
-		Status:"active",
+		Role: RoleMaster,
+		Status:NodeStatusActive,
 	}
 	if err := Db.Create(&node1).Error; err != nil {
 		panic(err)
 	}
 
 	node2 := SeederNode{
-		NodeName:"edge-node-pc",
+		ClusterName:"edge-node-pc",
 		AdvertiseAddr:"10.23.100.3:15300",
 		BindAddr:"10.12.102.181",
 		RepoAddr:"http://172.16.24.102",
-		Role:"follower",
-		Status:"active",
+		Role: RoleFollower,
+		Status:NodeStatusActive,
 	}
 	if err := Db.Create(&node2).Error; err != nil {
 		panic(err)
 	}
 
 	node3 := SeederNode{
-		NodeName:"edge-node-2",
+		ClusterName:"edge-node-2",
 		AdvertiseAddr:"10.23.100.4:15300",
 		BindAddr:"192.168.0.2:8080",
-		Role:"follower",
-		Status:"active",
+		Role: RoleFollower,
+		Status:NodeStatusActive,
 	}
 	if err := Db.Create(&node3).Error; err != nil {
 		panic(err)

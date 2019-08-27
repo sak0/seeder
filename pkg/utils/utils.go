@@ -10,6 +10,8 @@ import (
 	"github.com/hashicorp/consul/api"
 	"runtime"
 	"runtime/pprof"
+	"net/http"
+	"crypto/tls"
 )
 
 const (
@@ -17,6 +19,35 @@ const (
 	HealthCheckTimeout	= "10s"
 	HealthCheckInterval	= "15s"
 )
+
+var defaultHTTPTransport, secureHTTPTransport, insecureHTTPTransport *http.Transport
+
+func init() {
+	defaultHTTPTransport = &http.Transport{}
+
+	secureHTTPTransport = &http.Transport{
+		Proxy: http.ProxyFromEnvironment,
+		TLSClientConfig: &tls.Config{
+			InsecureSkipVerify: false,
+		},
+	}
+	insecureHTTPTransport = &http.Transport{
+		Proxy: http.ProxyFromEnvironment,
+		TLSClientConfig: &tls.Config{
+			InsecureSkipVerify: true,
+		},
+	}
+}
+
+func GetHTTPTransport(insecure ...bool) *http.Transport {
+	if len(insecure) == 0 {
+		return defaultHTTPTransport
+	}
+	if insecure[0] {
+		return insecureHTTPTransport
+	}
+	return secureHTTPTransport
+}
 
 func ArrayIn(item string, arr []string) bool {
 	for _, a := range arr {
