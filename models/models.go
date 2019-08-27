@@ -11,7 +11,7 @@ var Db *gorm.DB
 
 type SeederNode struct {
 	gorm.Model
-	ClusterName 		string   	`json:"node_name" gorm:"type:varchar(50);column:cluster_name"`
+	ClusterName 		string   	`json:"cluster_name" gorm:"type:varchar(50);column:cluster_name"`
 	AdvertiseAddr		string 		`json:"advertise_addr" gorm:"type:varchar(50);column:advertise_addr"`
 	BindAddr 			string		`json:"bind_addr" gorm:"type:varchar(50);column:bind_addr"`
 	RepoAddr 			string 		`json:"bind_addr" gorm:"type:varchar(50);column:repo_addr"`

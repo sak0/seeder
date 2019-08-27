@@ -582,11 +582,11 @@
                 "chart_count": {
                     "type": "integer"
                 },
+                "cluster_name": {
+                    "type": "string"
+                },
                 "image_count": {
                     "type": "integer"
-                },
-                "node_name": {
-                    "type": "string"
                 },
                 "pull_count": {
                     "type": "integer"
