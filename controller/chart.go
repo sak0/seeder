@@ -125,22 +125,71 @@ func GetChartVersion(c *gin.Context) {
 	page, _ := strconv.Atoi(c.Query("page"))
 	pageSize, _ := strconv.Atoi(c.Query("page_size"))
 
-	versions, count, err := models.GetVersionByChart(page, pageSize, chartName)
-	if err != nil {
-		RespErr(ERRINTERNALERR, ERROR_INVALID_PARAMS, "get version failed", c)
-		return
+
+	if clusterName == "" {
+		versions, count, err := models.GetVersionByChart(page, pageSize, chartName)
+		if err != nil {
+			RespErr(ERRINTERNALERR, ERROR_INVALID_PARAMS, "get version failed", c)
+			return
+		}
+
+		resp.Message = "get versions success."
+		resp.Data = PageList{
+			Offset:page,
+			Size:pageSize,
+			Total:count,
+			DataList:versions,
+		}
+		resp.Code = "200"
+
+		c.JSON(http.StatusOK, resp)
+	} else {
+		node, err := models.GetNodeByName(clusterName)
+		if err != nil {
+			glog.V(2).Infof("get node %s info failed: %v", clusterName, node)
+			RespErr(ERRBADREQUEST, ERROR_INVALID_PARAMS, err.Error(), c)
+			return
+		}
+		glog.V(2).Infof("get version from remote edge: %s", clusterName)
+
+		client := http.Client{
+			Transport:utils.GetHTTPTransport(true),
+		}
+
+		var url string
+		if pageSize > 0 && page > 0 {
+			url = fmt.Sprintf("http://%s/api/v1/chart?page=%d&page_size=%d", node.AdvertiseAddr, page, pageSize)
+		} else {
+			url = fmt.Sprintf("http://%s/api/v1/chart", node.AdvertiseAddr)
+		}
+		req, err := http.NewRequest(http.MethodGet, url, nil)
+		if err != nil {
+			RespErr(ERRINTERNALERR, ERROR_INVALID_PARAMS, err.Error(), c)
+			return
+		}
+
+		var remoteResp Response
+		remoteRawResp, err := client.Do(req)
+		if err != nil {
+			RespErr(ERRINTERNALERR, ERROR_INVALID_PARAMS, err.Error(), c)
+			return
+		}
+		data, err := ioutil.ReadAll(remoteRawResp.Body)
+		if err != nil {
+			RespErr(ERRINTERNALERR, ERROR_INVALID_PARAMS, err.Error(), c)
+			return
+		}
+		remoteRawResp.Body.Close()
+
+		err = json.Unmarshal(data, &remoteResp)
+		if err != nil {
+			RespErr(ERRINTERNALERR, ERROR_INVALID_PARAMS, err.Error(), c)
+			return
+		}
+
+		c.JSON(http.StatusOK, remoteResp)
 	}
 
-	resp.Message = "get versions success."
-	resp.Data = PageList{
-		Offset:page,
-		Size:pageSize,
-		Total:count,
-		DataList:versions,
-	}
-	resp.Code = "200"
-
-	c.JSON(http.StatusOK, resp)
 }
 
 // @Summary 下载更新指定Chart仓库的指定版本到本地仓库

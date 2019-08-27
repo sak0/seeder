@@ -68,8 +68,8 @@ func init() {
 // @license.name Apache 2.0
 // @license.url http://www.apache.org/licenses/LICENSE-2.0.html
 
-// @host seeder.pornhub.com
-// @BasePath /v1
+// @host 172.16.24.200:15000
+// @BasePath /
 func main() {
 	myIp, err := utils.GetMyIpAddr()
 	if err != nil {
