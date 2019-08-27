@@ -21,7 +21,7 @@ import (
 // @Param pageSize query int false "PageSize"
 // @Param status query bool false "VerifyStatus"
 // @Param cached query bool false "Cached"
-// @Param cluster query bool false "ClusterName"
+// @Param cluster query string false "ClusterName"
 // @Success 200 {object} models.ChartRepo
 // @Failure 500 {string} string "Internal Error"
 // @Router /api/v1/chart [get]
@@ -105,10 +105,10 @@ func GetChartRepo(c *gin.Context) {
 // @Param pageSize query int false "PageSize"
 // @Param status query bool false "VerifyStatus"
 // @Param cached query bool false "Cached"
-// @Param cluster query bool false "ClusterName"
+// @Param cluster query string false "ClusterName"
 // @Success 200 {object} models.ChartVersion
 // @Failure 500 {string} string "Internal Error"
-// @Router /api/v1/chart/{repo}/charts [get]
+// @Router /api/v1/chart/{chartName}/versions [get]
 func GetChartVersion(c *gin.Context) {
 	resp := Response{}
 	chartName := c.Param("id")
@@ -158,9 +158,10 @@ func GetChartVersion(c *gin.Context) {
 
 		var url string
 		if pageSize > 0 && page > 0 {
-			url = fmt.Sprintf("http://%s/api/v1/chart?page=%d&page_size=%d", node.AdvertiseAddr, page, pageSize)
+			url = fmt.Sprintf("http://%s/api/v1/chart/%s/versions?page=%d&page_size=%d",
+				node.AdvertiseAddr, chartName, page, pageSize)
 		} else {
-			url = fmt.Sprintf("http://%s/api/v1/chart", node.AdvertiseAddr)
+			url = fmt.Sprintf("http://%s/api/v1/chart/%s/versions", node.AdvertiseAddr, chartName)
 		}
 		req, err := http.NewRequest(http.MethodGet, url, nil)
 		if err != nil {

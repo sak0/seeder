@@ -136,7 +136,7 @@ paths:
       - description: ClusterName
         in: query
         name: cluster
-        type: boolean
+        type: string
       produces:
       - application/json
       responses:
@@ -149,6 +149,43 @@ paths:
           schema:
             type: string
       summary: 获取Chart仓库列表
+  /api/v1/chart/{chartName}/versions:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Page
+        in: query
+        name: page
+        type: integer
+      - description: PageSize
+        in: query
+        name: pageSize
+        type: integer
+      - description: VerifyStatus
+        in: query
+        name: status
+        type: boolean
+      - description: Cached
+        in: query
+        name: cached
+        type: boolean
+      - description: ClusterName
+        in: query
+        name: cluster
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ChartVersion'
+        "500":
+          description: Internal Error
+          schema:
+            type: string
+      summary: 获取指定Chart仓库的版本列表
   /api/v1/chart/{repo}/{version}:
     delete:
       consumes:
@@ -211,43 +248,6 @@ paths:
           schema:
             type: string
       summary: 推送指定Chart仓库的指定版本到远端仓库
-  /api/v1/chart/{repo}/charts:
-    get:
-      consumes:
-      - application/json
-      parameters:
-      - description: Page
-        in: query
-        name: page
-        type: integer
-      - description: PageSize
-        in: query
-        name: pageSize
-        type: integer
-      - description: VerifyStatus
-        in: query
-        name: status
-        type: boolean
-      - description: Cached
-        in: query
-        name: cached
-        type: boolean
-      - description: ClusterName
-        in: query
-        name: cluster
-        type: boolean
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.ChartVersion'
-        "500":
-          description: Internal Error
-          schema:
-            type: string
-      summary: 获取指定Chart仓库的版本列表
   /api/v1/cluster:
     get:
       consumes:
@@ -356,7 +356,7 @@ paths:
           schema:
             type: string
       summary: 下载更新指定镜像仓库的指定tag到本地仓库
-  /api/v1/repository/{repo}/tags:
+  /api/v1/repository/{repoName}/tags:
     get:
       consumes:
       - application/json

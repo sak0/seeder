@@ -15,7 +15,7 @@ import (
 // @Param cached query bool false "Cached"
 // @Success 200 {object} models.RepositoryTag
 // @Failure 500 {string} string "Internal Error"
-// @Router /api/v1/repository/{repo}/tags [get]
+// @Router /api/v1/repository/{repoName}/tags [get]
 func GetRepositoryTags(c *gin.Context) {
 	repo := c.Param("id")
 	resp := Response{}

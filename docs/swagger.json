@@ -52,7 +52,7 @@
                         "in": "query"
                     },
                     {
-                        "type": "boolean",
+                        "type": "string",
                         "description": "ClusterName",
                         "name": "cluster",
                         "in": "query"
@@ -74,7 +74,7 @@
                 }
             }
         },
-        "/api/v1/chart/{repo}/charts": {
+        "/api/v1/chart/{chartName}/versions": {
             "get": {
                 "consumes": [
                     "application/json"
@@ -109,7 +109,7 @@
                         "in": "query"
                     },
                     {
-                        "type": "boolean",
+                        "type": "string",
                         "description": "ClusterName",
                         "name": "cluster",
                         "in": "query"
@@ -333,7 +333,7 @@
                 }
             }
         },
-        "/api/v1/repository/{repo}/tags": {
+        "/api/v1/repository/{repoName}/tags": {
             "get": {
                 "consumes": [
                     "application/json"
