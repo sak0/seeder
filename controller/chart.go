@@ -10,6 +10,8 @@ import (
 	"github.com/sak0/seeder/models"
 	"github.com/sak0/seeder/pkg/utils"
 	"fmt"
+	"io/ioutil"
+	"encoding/json"
 )
 
 // @Summary 获取Chart仓库列表
@@ -27,7 +29,7 @@ func GetChartRepo(c *gin.Context) {
 	resp := Response{}
 
 	clusterName := c.Query("cluster_name")
-	glog.V(2).Infof("get chart for remote cluster: %s", clusterName)
+	glog.V(3).Infof("get chart for remote cluster: %s", clusterName)
 
 	page, _ := strconv.Atoi(c.Query("page"))
 	pageSize, _ := strconv.Atoi(c.Query("page_size"))
@@ -54,22 +56,43 @@ func GetChartRepo(c *gin.Context) {
 			RespErr(ERRBADREQUEST, ERROR_INVALID_PARAMS, err.Error(), c)
 			return
 		}
+		glog.V(2).Infof("get chart from remote edge: %s", clusterName)
 
 		client := http.Client{
 			Transport:utils.GetHTTPTransport(true),
 		}
-		url := fmt.Sprintf("http://%s/api/v1/chart", node.AdvertiseAddr)
+
+		var url string
+		if pageSize > 0 && page > 0 {
+			url = fmt.Sprintf("http://%s/api/v1/chart?page=%d&page_size=%d", node.AdvertiseAddr, page, pageSize)
+		} else {
+			url = fmt.Sprintf("http://%s/api/v1/chart", node.AdvertiseAddr)
+		}
 		req, err := http.NewRequest(http.MethodGet, url, nil)
 		if err != nil {
 			RespErr(ERRINTERNALERR, ERROR_INVALID_PARAMS, err.Error(), c)
 			return
 		}
 
-		remoteResp, err := client.Do(req)
+		var remoteResp Response
+		remoteRawResp, err := client.Do(req)
 		if err != nil {
 			RespErr(ERRINTERNALERR, ERROR_INVALID_PARAMS, err.Error(), c)
 			return
 		}
+		data, err := ioutil.ReadAll(remoteRawResp.Body)
+		if err != nil {
+			RespErr(ERRINTERNALERR, ERROR_INVALID_PARAMS, err.Error(), c)
+			return
+		}
+		remoteRawResp.Body.Close()
+
+		err = json.Unmarshal(data, &remoteResp)
+		if err != nil {
+			RespErr(ERRINTERNALERR, ERROR_INVALID_PARAMS, err.Error(), c)
+			return
+		}
+
 		c.JSON(http.StatusOK, remoteResp)
 	}
 }
@@ -96,11 +119,11 @@ func GetChartVersion(c *gin.Context) {
 	}
 	glog.V(5).Infof("ctr: get versions for chart %v", chartName)
 
+	clusterName := c.Query("cluster_name")
+	glog.V(3).Infof("get chart version for remote cluster: %s", clusterName)
+
 	page, _ := strconv.Atoi(c.Query("page"))
 	pageSize, _ := strconv.Atoi(c.Query("page_size"))
-
-	clusterName := c.Query("cluster_name")
-	glog.V(2).Infof("get version for remote cluster: %s", clusterName)
 
 	versions, count, err := models.GetVersionByChart(page, pageSize, chartName)
 	if err != nil {

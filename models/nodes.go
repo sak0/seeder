@@ -19,7 +19,7 @@ func GetNodeByName(name string) (*SeederNode, error) {
 	var node SeederNode
 	db := Db.Model(&SeederNode{})
 
-	db = db.Where("node_name = ?", name)
+	db = db.Where("cluster_name = ?", name)
 	db = db.Count(&count)
 	glog.V(5).Infof("db query nodes count %d", count)
 	db = db.Find(&node)

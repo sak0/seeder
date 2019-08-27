@@ -98,7 +98,7 @@ func initDBTables() {
 	Db = Db.Model(&SeederNode{})
 	node1 := SeederNode{
 		ClusterName:"master200",
-		AdvertiseAddr:"10.23.100.2:15300",
+		AdvertiseAddr:"172.16.24.200:15000",
 		BindAddr:"172.16.24.200",
 		RepoAddr:"http://172.16.24.103",
 		Role: RoleMaster,
@@ -110,8 +110,8 @@ func initDBTables() {
 
 	node2 := SeederNode{
 		ClusterName:"edge-node-pc",
-		AdvertiseAddr:"10.23.100.3:15300",
-		BindAddr:"10.12.102.181",
+		AdvertiseAddr:"10.12.103.89:15000",
+		BindAddr:"10.12.103.89",
 		RepoAddr:"http://172.16.24.102",
 		Role: RoleFollower,
 		Status:NodeStatusActive,
@@ -122,7 +122,7 @@ func initDBTables() {
 
 	node3 := SeederNode{
 		ClusterName:"edge-node-2",
-		AdvertiseAddr:"10.23.100.4:15300",
+		AdvertiseAddr:"10.23.100.4:15000",
 		BindAddr:"192.168.0.2:8080",
 		Role: RoleFollower,
 		Status:NodeStatusActive,
