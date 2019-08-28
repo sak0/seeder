@@ -190,7 +190,6 @@ func GetChartVersion(c *gin.Context) {
 
 		c.JSON(http.StatusOK, remoteResp)
 	}
-
 }
 
 // @Summary 下载更新指定Chart仓库的指定版本到本地仓库

@@ -90,6 +90,18 @@ func (c ChartVersion) TableName() string {
 	return "chart_version"
 }
 
+type VersionMarkRecord struct {
+	ChartName 		string 			`json:"chart_name" gorm:"type:varchar(50);column:chart_name"`
+	Version 		string			`json:"version" gorm:"type:varchar(50);column:version"`
+	Description		string			`json:"description" gorm:"type:varchar(255);column:description"`
+	Grade 			int				`json:"grade" gorm:"type:int;column:grade"`
+	TenantID 		string			`json:"tenant_id" gorm:"type:varchar(50);column:tenant_id"`
+}
+
+func (c VersionMarkRecord) TableName() string {
+	return "version_mark_record"
+}
+
 func initDBTables() {
 	tables := []interface{}{&SeederNode{}, &Repository{}, &RepositoryTag{}, &ChartRepo{}, &ChartVersion{}}
 	Db.DropTable(tables...)
