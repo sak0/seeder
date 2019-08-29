@@ -231,7 +231,7 @@ paths:
       consumes:
       - application/json
       parameters:
-      - description: EdgeNode
+      - description: remote
         in: query
         name: remote
         required: true

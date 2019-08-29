@@ -209,7 +209,7 @@ func DownloadChartVersion(c *gin.Context) {
 // @Summary 推送指定Chart仓库的指定版本到远端仓库
 // @Accept  json
 // @Produce json
-// @Param remote query string true "EdgeNode"
+// @Param remote query string true "remote"
 // @Success 202 {object} models.ChartVersion
 // @Failure 500 {string} string "Internal Error"
 // @Router /api/v1/chart/{repo}/{version}/push [post]
@@ -222,7 +222,7 @@ func PushChartVersion(c *gin.Context) {
 		return
 	}
 
-	remoteNode := c.Query("EdgeNode")
+	remoteNode := c.Query("remote")
 	if remoteNode == "" {
 		RespErr(ERRBADREQUEST, ERROR_INVALID_PARAMS, "must have remote node name.", c)
 		return

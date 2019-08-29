@@ -205,7 +205,7 @@
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "EdgeNode",
+                        "description": "remote",
                         "name": "remote",
                         "in": "query",
                         "required": true
