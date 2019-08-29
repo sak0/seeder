@@ -120,11 +120,11 @@ func GetChartVersion(c *gin.Context) {
 	}
 	glog.V(5).Infof("ctr: get versions for chart %v", chartName)
 
-	clusterName := c.Query("cluster_name")
+	clusterName := c.Query("ClusterName")
 	glog.V(3).Infof("get chart version for remote cluster: %s", clusterName)
 
-	page, _ := strconv.Atoi(c.Query("page"))
-	pageSize, _ := strconv.Atoi(c.Query("page_size"))
+	page, _ := strconv.Atoi(c.Query("Page"))
+	pageSize, _ := strconv.Atoi(c.Query("PageSize"))
 
 
 	if clusterName == "" {
