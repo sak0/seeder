@@ -135,9 +135,9 @@ func (n *SeederNode) Run() {
 func (n *SeederNode) broadcastRepoInfo(info []byte) {
 	glog.V(5).Infof("master %s broadcast repo info to all nodes", n.Name)
 	for _, node := range n.mList.Members() {
-		if strings.HasPrefix(node.Name, "master") {
-			continue
-		}
+		//if strings.HasPrefix(node.Name, "master") {
+		//	continue
+		//}
 		n.mList.SendToTCP(node, info)
 	}
 }
