@@ -13,7 +13,8 @@ import (
 		common_http "github.com/sak0/seeder/pkg/common/http"
 	"github.com/golang/glog"
 	"github.com/sak0/seeder/pkg/utils"
-	)
+	"net/url"
+)
 
 type Transfer struct {
 	srcAddr 		string
@@ -218,6 +219,10 @@ func mustHarborClient(repoAddr string)(*harbor.Client, error) {
 
 func NewTransfer(srcAddr, dstAddr string) (*Transfer, error) {
 	transport := utils.GetHTTPTransport(true)
+	transport.Proxy =  func(req *http.Request) (*url.URL, error) {
+		req.SetBasicAuth("admin", "Harbor12345")
+		return nil, nil
+	}
 
 	sc, err := mustHarborClient(srcAddr)
 	if err != nil {

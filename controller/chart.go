@@ -246,6 +246,8 @@ func PushChartVersion(c *gin.Context) {
 		return
 	}
 
+	resp.Message = "push completed"
+	resp.Code = "200"
 	c.JSON(http.StatusOK, resp)
 }
 

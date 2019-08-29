@@ -177,9 +177,10 @@ func (n *SeederNode) doLoop() {
 			return
 		}
 		glog.V(5).Infof("receive local report: %v", reportInfo)
-		if n.Role == "master" {
-			n.broadcastRepoInfo(received)
-		}
+		//if n.Role == "master" {
+		//	n.broadcastRepoInfo(received)
+		//}
+		n.broadcastRepoInfo(received)
 	}
 }
 

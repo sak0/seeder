@@ -45,7 +45,7 @@ var (
 func init() {
 	flag.StringVar(&advAddr, "advertise-addr", "10.12.103.89", "addr for advertise.")
 	flag.StringVar(&repoAddr, "repo-addr", "http://172.16.24.103", "addr for repo.")
-	flag.StringVar(&myName, "node-name", "edge-node-1", "seeder node name.")
+	flag.StringVar(&myName, "node-name", "edge-node-pc", "seeder node name.")
 	flag.StringVar(&dbAddr, "db-addr", "172.16.24.103:3306", "database connection url.")
 	flag.StringVar(&dbName, "db-name", "seeder", "database name to use.")
 	flag.StringVar(&dbUser, "db-user", "root", "database login name.")

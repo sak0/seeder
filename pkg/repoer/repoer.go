@@ -51,8 +51,17 @@ func (w *RepoWatcher) Run() {
 }
 
 func (w *RepoWatcher) doLoop() {
+	proOpts := harbor.ListProjectsOptions{
+		Name : utils.DefaultProjectName,
+	}
+	projects, _, errs := w.client.Projects.ListProject(&proOpts)
+	if len(errs) > 0 {
+		glog.V(2).Infof("list repository failed: %v", errs)
+		return
+	}
+
 	repoOpts := harbor.ListRepositoriesOption{
-		ProjectId: 3,
+		ProjectId: projects[0].ProjectID,
 	}
 	repos, _, errs := w.client.Repositories.ListRepository(&repoOpts)
 	if len(errs) > 0 {

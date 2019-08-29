@@ -19,9 +19,9 @@ const (
 	verifyStatusUnknown	= "unknown"
 )
 
-func formatVersions(masterInfo repoer.ReporterInfo) []*models.ChartVersion {
+func formatVersions(keepInfo repoer.ReporterInfo) []*models.ChartVersion {
 	var versions []*models.ChartVersion
-	for _, chartVersion := range masterInfo.Versions {
+	for _, chartVersion := range keepInfo.Versions {
 		version := &models.ChartVersion {
 			Name:chartVersion.Name,
 			Version:chartVersion.Version,
@@ -38,9 +38,9 @@ func formatVersions(masterInfo repoer.ReporterInfo) []*models.ChartVersion {
 	return versions
 }
 
-func formatCharts(masterInfo repoer.ReporterInfo) []*models.ChartRepo {
+func formatCharts(keepInfo repoer.ReporterInfo) []*models.ChartRepo {
 	var charts []*models.ChartRepo
-	for _, chartRepo := range masterInfo.Charts {
+	for _, chartRepo := range keepInfo.Charts {
 		chart := &models.ChartRepo{
 			OwnerNode:"master",
 			Name:chartRepo.Name,
@@ -57,9 +57,9 @@ func formatCharts(masterInfo repoer.ReporterInfo) []*models.ChartRepo {
 	return charts
 }
 
-func formatTags(masterInfo repoer.ReporterInfo) []*models.RepositoryTag {
+func formatTags(keepInfo repoer.ReporterInfo) []*models.RepositoryTag {
 	var tags []*models.RepositoryTag
-	for _, repoTag := range masterInfo.Tags {
+	for _, repoTag := range keepInfo.Tags {
 		tag := &models.RepositoryTag{
 			Digest:repoTag.Digest,
 			TagName:repoTag.Name,
@@ -77,11 +77,11 @@ func formatTags(masterInfo repoer.ReporterInfo) []*models.RepositoryTag {
 	return tags
 }
 
-func formatRepos(masterInfo repoer.ReporterInfo) []*models.Repository {
+func formatRepos(keepInfo repoer.ReporterInfo) []*models.Repository {
 	var repos []*models.Repository
-	for _, infoRepo := range masterInfo.Repos {
+	for _, infoRepo := range keepInfo.Repos {
 		repo := &models.Repository{
-			OwnerNode: masterInfo.NodeName,
+			OwnerNode: keepInfo.NodeName,
 			Name: infoRepo.Name,
 			Description: infoRepo.Description,
 			PullCount:infoRepo.PullCount,
@@ -180,21 +180,23 @@ type LocalKeeper struct {
 	interval    time.Duration
 }
 
-func (k *LocalKeeper) getMasterInfo() (repoer.ReporterInfo, error){
-	var masterName string
-	nodes := k.reporter.GetNodes()
-	for name, role := range nodes {
-		if role == "master" {
-			masterName = name
-		}
-	}
-
+func (k *LocalKeeper) getKeepInfo() (repoer.ReporterInfo, error){
 	clusterInfo := k.reporter.GetInfoMap()
-	masterInfo, ok := clusterInfo[masterName]
+
+	//var masterName string
+	//nodes := k.reporter.GetNodes()
+	//for name, role := range nodes {
+	//	if role == "master" {
+	//		masterName = name
+	//	}
+	//}
+	//masterInfo, ok := clusterInfo[masterName]
+
+	keepInfo, ok := clusterInfo[k.name]
 	if !ok {
-		return repoer.ReporterInfo{}, fmt.Errorf(fmt.Sprintf("miss master info from reporter"))
+		return repoer.ReporterInfo{}, fmt.Errorf(fmt.Sprintf("miss %s info from reporter", k.name))
 	}
-	return masterInfo, nil
+	return keepInfo, nil
 }
 
 func (k *LocalKeeper) getLocalVersions() ([]*models.ChartVersion, error) {
@@ -258,8 +260,8 @@ func (k *LocalKeeper) addRepo(repository *models.Repository) {
 	}
 }
 
-func (k *LocalKeeper) syncRepos(masterInfo repoer.ReporterInfo) {
-	remoteRepos := formatRepos(masterInfo)
+func (k *LocalKeeper) syncRepos(keepInfo repoer.ReporterInfo) {
+	remoteRepos := formatRepos(keepInfo)
 	localRepos, err := k.getLocalRepos()
 	if err != nil {
 		glog.V(2).Infof("get local repo failed: %v", err)
@@ -273,8 +275,8 @@ func (k *LocalKeeper) syncRepos(masterInfo repoer.ReporterInfo) {
 	}
 }
 
-func (k *LocalKeeper) syncTags(masterInfo repoer.ReporterInfo) {
-	remoteTags := formatTags(masterInfo)
+func (k *LocalKeeper) syncTags(keepInfo repoer.ReporterInfo) {
+	remoteTags := formatTags(keepInfo)
 	localTags, err := k.getLocalTags()
 	if err != nil {
 		glog.V(2).Infof("get local tags failed: %v", err)
@@ -288,8 +290,8 @@ func (k *LocalKeeper) syncTags(masterInfo repoer.ReporterInfo) {
 	}
 }
 
-func (k *LocalKeeper) syncCharts(masterInfo repoer.ReporterInfo) {
-	remoteCharts := formatCharts(masterInfo)
+func (k *LocalKeeper) syncCharts(keepInfo repoer.ReporterInfo) {
+	remoteCharts := formatCharts(keepInfo)
 	localCharts, err := k.getLocalCharts()
 	if err != nil {
 		glog.V(2).Infof("get local charts failed: %v", err)
@@ -303,8 +305,8 @@ func (k *LocalKeeper) syncCharts(masterInfo repoer.ReporterInfo) {
 	}
 }
 
-func (k *LocalKeeper) syncVersions(masterInfo repoer.ReporterInfo) {
-	remoteVersions := formatVersions(masterInfo)
+func (k *LocalKeeper) syncVersions(keepInfo repoer.ReporterInfo) {
+	remoteVersions := formatVersions(keepInfo)
 	localVersions, err := k.getLocalVersions()
 	if err != nil {
 		glog.V(2).Infof("get local charts failed: %v", err)
@@ -319,17 +321,19 @@ func (k *LocalKeeper) syncVersions(masterInfo repoer.ReporterInfo) {
 }
 
 func (k *LocalKeeper) doSync() {
-	masterInfo, err := k.getMasterInfo()
+	keepInfo, err := k.getKeepInfo()
 	if err != nil {
 		glog.V(2).Infof("get master info failed: %v", err)
 		return
 	}
 
+	glog.V(5).Infof("keeper sync: %v", keepInfo)
+
 	{
-		k.syncRepos(masterInfo)
-		k.syncTags(masterInfo)
-		k.syncCharts(masterInfo)
-		k.syncVersions(masterInfo)
+		k.syncRepos(keepInfo)
+		k.syncTags(keepInfo)
+		k.syncCharts(keepInfo)
+		k.syncVersions(keepInfo)
 	}
 }
 
