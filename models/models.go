@@ -122,8 +122,8 @@ func initDBTables() {
 
 	node2 := SeederNode{
 		ClusterName:"edge-node-pc",
-		AdvertiseAddr:"10.12.103.89:15000",
-		BindAddr:"10.12.103.89",
+		AdvertiseAddr:"10.12.102.228:15000",
+		BindAddr:"10.12.102.228",
 		RepoAddr:"http://172.16.24.102",
 		Role: RoleFollower,
 		Status:NodeStatusActive,
