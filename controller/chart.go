@@ -29,11 +29,11 @@ import (
 func GetChartRepo(c *gin.Context) {
 	resp := Response{}
 
-	clusterName := c.Query("cluster_name")
+	clusterName := c.Query("ClusterName")
 	glog.V(3).Infof("get chart for remote cluster: %s", clusterName)
 
-	page, _ := strconv.Atoi(c.Query("page"))
-	pageSize, _ := strconv.Atoi(c.Query("page_size"))
+	page, _ := strconv.Atoi(c.Query("Page"))
+	pageSize, _ := strconv.Atoi(c.Query("PageSize"))
 
 	if clusterName == "" {
 		charts, count, err := models.GetAllCharts(page, pageSize)
