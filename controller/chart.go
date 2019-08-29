@@ -222,7 +222,7 @@ func PushChartVersion(c *gin.Context) {
 		return
 	}
 
-	remoteNode := c.Query("remote")
+	remoteNode := c.Query("EdgeNode")
 	if remoteNode == "" {
 		RespErr(ERRBADREQUEST, ERROR_INVALID_PARAMS, "must have remote node name.", c)
 		return
