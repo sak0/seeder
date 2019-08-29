@@ -10,11 +10,10 @@ import (
 	"mime/multipart"
 
 	"github.com/sak0/go-harbor"
-	"github.com/sak0/seeder/pkg/repoer"
-
-	common_http "github.com/sak0/seeder/pkg/common/http"
+		common_http "github.com/sak0/seeder/pkg/common/http"
 	"github.com/golang/glog"
-)
+	"github.com/sak0/seeder/pkg/utils"
+	)
 
 type Transfer struct {
 	srcAddr 		string
@@ -74,6 +73,7 @@ func (t *Transfer) getChartInfo(name, version string) (*chartVersionDetail, erro
 	//if err != nil {
 	//	return nil, err
 	//}
+	glog.V(2).Infof("getChart info from %s", url)
 	err = t.client.Get(url, info)
 	if err != nil {
 		return nil, err
@@ -160,6 +160,11 @@ func (t *Transfer) uploadChart(name, version string, chart io.Reader) error {
 	return nil
 }
 
+func (t *Transfer) Transfer(name, version string) error {
+	fullName := utils.DefaultProjectName + "/" + name
+	return t.copy(fullName, version, true)
+}
+
 func (t *Transfer) copy(name, version string, override bool) error {
 	glog.V(2).Infof("copying %s:%s(source registry) to %s:%s(destination registry)...",
 		name, version, name, version)
@@ -203,7 +208,7 @@ func (t *Transfer) copy(name, version string, override bool) error {
 
 func mustHarborClient(repoAddr string)(*harbor.Client, error) {
 	client := harbor.NewClient(nil, repoAddr, "admin", "Harbor12345")
-	opt := harbor.ListProjectsOptions{Name: repoer.DefaultProjectName}
+	opt := harbor.ListProjectsOptions{Name: utils.DefaultProjectName}
 	_, _, errs := client.Projects.ListProject(&opt)
 	if len(errs) > 0 {
 		return nil, errs[0]
@@ -212,6 +217,8 @@ func mustHarborClient(repoAddr string)(*harbor.Client, error) {
 }
 
 func NewTransfer(srcAddr, dstAddr string) (*Transfer, error) {
+	transport := utils.GetHTTPTransport(true)
+
 	sc, err := mustHarborClient(srcAddr)
 	if err != nil {
 		return nil, err
@@ -226,5 +233,9 @@ func NewTransfer(srcAddr, dstAddr string) (*Transfer, error) {
 		dstAddr : dstAddr,
 		SrcRepo : sc,
 		DstRepo : dc,
+		client: common_http.NewClient(
+			&http.Client{
+				Transport: transport,
+			},),
 	}, nil
 }

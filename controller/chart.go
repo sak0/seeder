@@ -3,15 +3,16 @@ package controller
 import (
 	"net/http"
 	"strconv"
+	"fmt"
+	"io/ioutil"
+	"encoding/json"
 
 	"github.com/golang/glog"
 	"github.com/gin-gonic/gin"
 
 	"github.com/sak0/seeder/models"
 	"github.com/sak0/seeder/pkg/utils"
-	"fmt"
-	"io/ioutil"
-	"encoding/json"
+	"github.com/sak0/seeder/pkg/transfer"
 )
 
 // @Summary 获取Chart仓库列表
@@ -233,7 +234,17 @@ func PushChartVersion(c *gin.Context) {
 		return
 	}
 
-	glog.V(2).Infof("prepare push version %s to remote node %v", version, nodeInfo)
+	glog.V(2).Infof("prepare push %s:%s to remote node %v", chartName, version, nodeInfo.RepoAddr)
+
+	trans, err := transfer.NewTransfer("http://172.16.24.103", nodeInfo.RepoAddr)
+	if err != nil {
+		RespErr(ERRINTERNALERR, ERROR_INVALID_PARAMS, err.Error(), c)
+		return
+	}
+	if err := trans.Transfer(chartName, version); err != nil {
+		RespErr(ERRINTERNALERR, ERROR_INVALID_PARAMS, err.Error(), c)
+		return
+	}
 
 	c.JSON(http.StatusOK, resp)
 }

@@ -5,11 +5,11 @@ import (
 	"github.com/sak0/go-harbor"
 	"github.com/golang/glog"
 	"encoding/json"
+	"github.com/sak0/seeder/pkg/utils"
 )
 
 const (
 	defaultWatchInterval 	= 10 * time.Second
-	DefaultProjectName 		= "edge-cloud"
 )
 
 type ReporterInfo struct {
@@ -75,7 +75,7 @@ func (w *RepoWatcher) doLoop() {
 	}
 	w.info.Tags = totalTags
 
-	charts, _, errs := w.client.ChartRepos.ListChartRepositories(DefaultProjectName)
+	charts, _, errs := w.client.ChartRepos.ListChartRepositories(utils.DefaultProjectName)
 	if len(errs) > 0 {
 		glog.V(2).Infof("list chartRepos failed: %v", errs)
 		return
@@ -84,7 +84,7 @@ func (w *RepoWatcher) doLoop() {
 
 	var totalVersions []harbor.ChartVersionRecord
 	for _, chart := range charts {
-		versions, _, errs := w.client.ChartRepos.ListChartVersions(DefaultProjectName, chart.Name)
+		versions, _, errs := w.client.ChartRepos.ListChartVersions(utils.DefaultProjectName, chart.Name)
 		if len(errs) > 0 {
 			glog.V(2).Infof("list chartRepos %s version failed: %v", chart.Name, errs)
 			continue
@@ -99,7 +99,7 @@ func (w *RepoWatcher) doLoop() {
 
 func NewRepoWatcher(nodeName, nodeRole, repoAddr string, stopCh chan interface{}) (*RepoWatcher, error){
 	harborClient := harbor.NewClient(nil, repoAddr,"admin","Harbor12345")
-	opt := harbor.ListProjectsOptions{Name: DefaultProjectName}
+	opt := harbor.ListProjectsOptions{Name: utils.DefaultProjectName}
 	projects, _, errs := harborClient.Projects.ListProject(&opt)
 	if len(errs) > 0 {
 		return nil, errs[0]

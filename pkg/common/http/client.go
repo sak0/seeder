@@ -72,11 +72,11 @@ func NewClient(c *http.Client, modifiers ...modifier.Modifier) *Client {
 
 // Do ...
 func (c *Client) Do(req *http.Request) (*http.Response, error) {
-	for _, modifier := range c.modifiers {
-		if err := modifier.Modify(req); err != nil {
-			return nil, err
-		}
-	}
+	//for _, modifier := range c.modifiers {
+	//	if err := modifier.Modify(req); err != nil {
+	//		return nil, err
+	//	}
+	//}
 
 	return c.client.Do(req)
 }

@@ -18,6 +18,8 @@ const (
 	DeRegisterInterval 	= "2m"
 	HealthCheckTimeout	= "10s"
 	HealthCheckInterval	= "15s"
+
+	DefaultProjectName 		= "edge-cloud"
 )
 
 var defaultHTTPTransport, secureHTTPTransport, insecureHTTPTransport *http.Transport
