@@ -111,7 +111,7 @@ func main() {
 	// clusterSyncer: aggregate all nodes info
 	// localKeeper: sync cluster info to local database
 	{
-		repoWatcher, err := repoer.NewRepoWatcher(myName, role, repoAddr, advAddr, myIp, done)
+		repoWatcher, err := repoer.NewRepoWatcher(myName, role, repoAddr, advAddr + ":" + strconv.Itoa(PortIUse), myIp, done)
 		if err != nil {
 			glog.Fatalf("watch repo %s failed: %v", repoAddr, err)
 			return

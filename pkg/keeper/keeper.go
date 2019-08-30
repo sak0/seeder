@@ -316,8 +316,8 @@ func (k *LocalKeeper) syncNode(keepInfo repoer.ReporterInfo) {
 		glog.V(2).Infof("get local nodes failed: %v", err)
 		return
 	}
-	glog.V(5).Infof("[remoteNode] %v", remoteNode)
-	glog.V(5).Infof("[localNodes] %v", localNodes)
+	glog.V(2).Infof("[remoteNode] %v", remoteNode)
+	glog.V(2).Infof("[localNodes] %v", localNodes)
 	nodeAdds, _, _ := diffNodes(remoteNode, localNodes)
 	for _, nodeAdd := range nodeAdds {
 		k.addNode(nodeAdd)
