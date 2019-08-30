@@ -16,3 +16,13 @@ func GetSeederNodes(page, pageSize int) ([]*SeederNode, int, error) {
 
 	return nodes, count, nil
 }
+
+func CreateNode(node *SeederNode) error {
+	glog.V(5).Infof("create node item: %v", node)
+
+	db := Db.Model(&SeederNode{})
+	if err := db.Create(node).Error; err != nil {
+		return err
+	}
+	return nil
+}

@@ -107,41 +107,41 @@ func initDBTables() {
 	Db.DropTable(tables...)
 	Db.CreateTable(tables...)
 
-	Db = Db.Model(&SeederNode{})
-	node1 := SeederNode{
-		ClusterName:"master200",
-		AdvertiseAddr:"172.16.24.200:15000",
-		BindAddr:"172.16.24.200",
-		RepoAddr:"http://172.16.24.103",
-		Role: RoleMaster,
-		Status:NodeStatusActive,
-	}
-	if err := Db.Create(&node1).Error; err != nil {
-		panic(err)
-	}
-
-	node2 := SeederNode{
-		ClusterName:"edge-node-pc",
-		AdvertiseAddr:"10.12.102.228:15000",
-		BindAddr:"10.12.102.228",
-		RepoAddr:"http://172.16.24.102",
-		Role: RoleFollower,
-		Status:NodeStatusActive,
-	}
-	if err := Db.Create(&node2).Error; err != nil {
-		panic(err)
-	}
-
-	node3 := SeederNode{
-		ClusterName:"edge-node-2",
-		AdvertiseAddr:"10.23.100.4:15000",
-		BindAddr:"192.168.0.2:8080",
-		Role: RoleFollower,
-		Status:NodeStatusActive,
-	}
-	if err := Db.Create(&node3).Error; err != nil {
-		panic(err)
-	}
+	//Db = Db.Model(&SeederNode{})
+	//node1 := SeederNode{
+	//	ClusterName:"master200",
+	//	AdvertiseAddr:"172.16.24.200:15000",
+	//	BindAddr:"172.16.24.200",
+	//	RepoAddr:"http://172.16.24.103",
+	//	Role: RoleMaster,
+	//	Status:NodeStatusActive,
+	//}
+	//if err := Db.Create(&node1).Error; err != nil {
+	//	panic(err)
+	//}
+	//
+	//node2 := SeederNode{
+	//	ClusterName:"edge-node-pc",
+	//	AdvertiseAddr:"10.12.102.228:15000",
+	//	BindAddr:"10.12.102.228",
+	//	RepoAddr:"http://172.16.24.102",
+	//	Role: RoleFollower,
+	//	Status:NodeStatusActive,
+	//}
+	//if err := Db.Create(&node2).Error; err != nil {
+	//	panic(err)
+	//}
+	//
+	//node3 := SeederNode{
+	//	ClusterName:"edge-node-2",
+	//	AdvertiseAddr:"10.23.100.4:15000",
+	//	BindAddr:"192.168.0.2:8080",
+	//	Role: RoleFollower,
+	//	Status:NodeStatusActive,
+	//}
+	//if err := Db.Create(&node3).Error; err != nil {
+	//	panic(err)
+	//}
 }
 
 func InitDB(DbAddr, DbName, User, Password string, needInitDb bool) error {

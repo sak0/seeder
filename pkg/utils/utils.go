@@ -24,6 +24,16 @@ const (
 
 var defaultHTTPTransport, secureHTTPTransport, insecureHTTPTransport *http.Transport
 
+var MyNodeName string
+
+func SetNodeName(myName string) {
+	MyNodeName = myName
+}
+
+func GetMyNodeName() string {
+	return MyNodeName
+}
+
 func init() {
 	defaultHTTPTransport = &http.Transport{}
 

@@ -19,6 +19,24 @@ const (
 	verifyStatusUnknown	= "unknown"
 )
 
+func formatNode(keepInfo repoer.ReporterInfo) (*models.SeederNode, error) {
+	if keepInfo.NodeInfo == nil {
+		return nil, fmt.Errorf("invalid report info: %s", keepInfo.NodeName)
+	}
+
+	return &models.SeederNode{
+		ClusterName:keepInfo.NodeInfo.NodeName,
+		AdvertiseAddr:keepInfo.NodeInfo.AdvertiseAddr,
+		BindAddr:keepInfo.NodeInfo.BindAddr,
+		RepoAddr:keepInfo.NodeInfo.RepoAddr,
+		Role:keepInfo.NodeInfo.NodeRole,
+		ImageCount:keepInfo.NodeInfo.ImageCount,
+		ChartCount:keepInfo.NodeInfo.ChartCount,
+		PullCount:keepInfo.NodeInfo.PullCount,
+		Status:keepInfo.NodeInfo.Status,
+	}, nil
+}
+
 func formatVersions(keepInfo repoer.ReporterInfo) []*models.ChartVersion {
 	var versions []*models.ChartVersion
 	for _, chartVersion := range keepInfo.Versions {
@@ -81,7 +99,7 @@ func formatRepos(keepInfo repoer.ReporterInfo) []*models.Repository {
 	var repos []*models.Repository
 	for _, infoRepo := range keepInfo.Repos {
 		repo := &models.Repository{
-			OwnerNode: keepInfo.NodeName,
+			OwnerNode: keepInfo.NodeInfo.NodeName,
 			Name: infoRepo.Name,
 			Description: infoRepo.Description,
 			PullCount:infoRepo.PullCount,
@@ -92,6 +110,23 @@ func formatRepos(keepInfo repoer.ReporterInfo) []*models.Repository {
 		repos = append(repos, repo)
 	}
 	return repos
+}
+
+func diffNodes(remote *models.SeederNode, local []*models.SeederNode) ([]*models.SeederNode, []*models.SeederNode, []*models.SeederNode) {
+	var addNodes []*models.SeederNode
+
+	found := false
+	for _, localNode := range local {
+		if remote.ClusterName == localNode.ClusterName {
+			found = true
+			continue
+		}
+	}
+	if !found {
+		addNodes = append(addNodes, remote)
+	}
+
+	return addNodes, nil, nil
 }
 
 func diffTags(remote, local []*models.RepositoryTag) ([]*models.RepositoryTag, []*models.RepositoryTag, []*models.RepositoryTag) {
@@ -180,23 +215,26 @@ type LocalKeeper struct {
 	interval    time.Duration
 }
 
-func (k *LocalKeeper) getKeepInfo() (repoer.ReporterInfo, error){
-	clusterInfo := k.reporter.GetInfoMap()
+func (k *LocalKeeper) getClusterInfo() map[string]repoer.ReporterInfo {
+	return k.reporter.GetInfoMap()
+}
 
-	//var masterName string
-	//nodes := k.reporter.GetNodes()
-	//for name, role := range nodes {
-	//	if role == "master" {
-	//		masterName = name
-	//	}
-	//}
-	//masterInfo, ok := clusterInfo[masterName]
+func (k *LocalKeeper) getKeepInfo() (repoer.ReporterInfo, error){
+	clusterInfo := k.getClusterInfo()
 
 	keepInfo, ok := clusterInfo[k.name]
 	if !ok {
 		return repoer.ReporterInfo{}, fmt.Errorf(fmt.Sprintf("miss %s info from reporter", k.name))
 	}
 	return keepInfo, nil
+}
+
+func (k *LocalKeeper) getLocalNodes() ([]*models.SeederNode, error) {
+	nodes, _, err := models.GetSeederNodes(0, 0)
+	if err != nil {
+		return nil, err
+	}
+	return nodes, nil
 }
 
 func (k *LocalKeeper) getLocalVersions() ([]*models.ChartVersion, error) {
@@ -232,6 +270,13 @@ func (k *LocalKeeper) getLocalRepos() ([]*models.Repository, error) {
 	return repos, nil
 }
 
+func (k *LocalKeeper) addNode(node *models.SeederNode) {
+	glog.V(2).Infof("ADD NODE: %v", node)
+	if err := models.CreateNode(node); err != nil {
+		glog.V(2).Infof("add node failed: %v", err)
+	}
+}
+
 func (k *LocalKeeper) addTag(tag *models.RepositoryTag) {
 	glog.V(2).Infof("ADD TAG: %v", tag)
 	if err := models.CreateTag(tag); err != nil {
@@ -257,6 +302,25 @@ func (k *LocalKeeper) addRepo(repository *models.Repository) {
 	glog.V(2).Infof("ADD REPO: %v", repository)
 	if err := models.CreateRepo(repository); err != nil {
 		glog.V(2).Infof("add repo failed: %v", err)
+	}
+}
+
+func (k *LocalKeeper) syncNode(keepInfo repoer.ReporterInfo) {
+	remoteNode, err := formatNode(keepInfo)
+	if err != nil {
+		glog.V(2).Infof("get remote nodes failed: %v", err)
+		return
+	}
+	localNodes, err := k.getLocalNodes()
+	if err != nil {
+		glog.V(2).Infof("get local nodes failed: %v", err)
+		return
+	}
+	glog.V(5).Infof("[remoteNode] %v", remoteNode)
+	glog.V(5).Infof("[localNodes] %v", localNodes)
+	nodeAdds, _, _ := diffNodes(remoteNode, localNodes)
+	for _, nodeAdd := range nodeAdds {
+		k.addNode(nodeAdd)
 	}
 }
 
@@ -323,7 +387,7 @@ func (k *LocalKeeper) syncVersions(keepInfo repoer.ReporterInfo) {
 func (k *LocalKeeper) doSync() {
 	keepInfo, err := k.getKeepInfo()
 	if err != nil {
-		glog.V(2).Infof("get master info failed: %v", err)
+		glog.V(2).Infof("get keep info failed: %v", err)
 		return
 	}
 
@@ -334,6 +398,11 @@ func (k *LocalKeeper) doSync() {
 		k.syncTags(keepInfo)
 		k.syncCharts(keepInfo)
 		k.syncVersions(keepInfo)
+	}
+
+	clusterInfo := k.getClusterInfo()
+	for _, info := range clusterInfo {
+		k.syncNode(info)
 	}
 }
 

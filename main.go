@@ -40,6 +40,8 @@ var (
 	master 			string
 	repoAddr		string
 	advAddr 		string
+
+	useNat 			bool
 )
 
 func init() {
@@ -53,7 +55,10 @@ func init() {
 	flag.StringVar(&role, "role", "follower", "seeder role.")
 	flag.StringVar(&master,"master-addr", "", "master addr")
 	flag.BoolVar(&initDb, "init-db", true, "if need init database.")
+	flag.BoolVar(&useNat, "use-nat", false, "if use nat access.")
 	flag.Parse()
+
+	utils.SetNodeName(myName)
 }
 
 // @title Seeder API
@@ -74,6 +79,9 @@ func main() {
 	myIp, err := utils.GetMyIpAddr()
 	if err != nil {
 		panic(err)
+	}
+	if !useNat {
+		advAddr = myIp
 	}
 
 	if err := models.InitDB(dbAddr, dbName, dbUser, dbPassword, initDb); err != nil {
@@ -103,7 +111,7 @@ func main() {
 	// clusterSyncer: aggregate all nodes info
 	// localKeeper: sync cluster info to local database
 	{
-		repoWatcher, err := repoer.NewRepoWatcher(myName, role, repoAddr, done)
+		repoWatcher, err := repoer.NewRepoWatcher(myName, role, repoAddr, advAddr, myIp, done)
 		if err != nil {
 			glog.Fatalf("watch repo %s failed: %v", repoAddr, err)
 			return

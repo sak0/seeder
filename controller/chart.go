@@ -222,21 +222,26 @@ func PushChartVersion(c *gin.Context) {
 		return
 	}
 
-	remoteNode := c.Query("remote")
-	if remoteNode == "" {
+	remoteNodeName := c.Query("remote")
+	if remoteNodeName == "" {
 		RespErr(ERRBADREQUEST, ERROR_INVALID_PARAMS, "must have remote node name.", c)
 		return
 	}
 
-	nodeInfo, err := models.GetNodeByName(remoteNode)
+	remoteNode, err := models.GetNodeByName(remoteNodeName)
+	if err != nil {
+		RespErr(ERRINTERNALERR, ERROR_INVALID_PARAMS, err.Error(), c)
+		return
+	}
+	localNode, err := models.GetNodeByName(utils.GetMyNodeName())
 	if err != nil {
 		RespErr(ERRINTERNALERR, ERROR_INVALID_PARAMS, err.Error(), c)
 		return
 	}
 
-	glog.V(2).Infof("prepare push %s:%s to remote node %v", chartName, version, nodeInfo.RepoAddr)
+	glog.V(2).Infof("prepare push %s:%s to remote node %v", chartName, version, remoteNode.RepoAddr)
 
-	trans, err := transfer.NewTransfer("http://172.16.24.103", nodeInfo.RepoAddr)
+	trans, err := transfer.NewTransfer(localNode.RepoAddr, remoteNode.RepoAddr)
 	if err != nil {
 		RespErr(ERRINTERNALERR, ERROR_INVALID_PARAMS, err.Error(), c)
 		return

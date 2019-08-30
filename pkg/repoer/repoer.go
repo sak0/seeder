@@ -6,15 +6,29 @@ import (
 	"github.com/golang/glog"
 	"encoding/json"
 	"github.com/sak0/seeder/pkg/utils"
-)
+	)
 
 const (
 	defaultWatchInterval 	= 10 * time.Second
+
+	StatusActive 			= "active"
 )
 
+type NodeInfo struct {
+	NodeName 		string		`json:"node_name"`
+	NodeRole 		string		`json:"node_role"`
+	AdvertiseAddr 	string		`json:"advertise_addr"`
+	BindAddr 		string		`json:"bind_addr"`
+	RepoAddr 		string 		`json:"repo_addr"`
+	ImageCount 		int			`json:"image_count"`
+	ChartCount 		int			`json:"chart_count"`
+	PullCount 		int			`json:"pull_count"`
+	Status 			string		`json:"status"`
+}
+
 type ReporterInfo struct {
-	NodeName 	string							`json:"node_name"`
-	NodeRole 	string							`json:"node_role"`
+	NodeName 	string 							`json:"node_name"`
+	NodeInfo    *NodeInfo 						`json:"node_info"`
 	Repos		[]harbor.RepoRecord				`json:"repos"`
 	Tags 		[]harbor.TagResp				`json:"tags"`
 	Charts 		[]harbor.ChartRepoRecord		`json:"charts"`
@@ -106,7 +120,8 @@ func (w *RepoWatcher) doLoop() {
 	w.info.Versions = totalVersions
 }
 
-func NewRepoWatcher(nodeName, nodeRole, repoAddr string, stopCh chan interface{}) (*RepoWatcher, error){
+func NewRepoWatcher(nodeName, nodeRole, repoAddr, advAddr, bindAddr string,
+			stopCh chan interface{}) (*RepoWatcher, error){
 	harborClient := harbor.NewClient(nil, repoAddr,"admin","Harbor12345")
 	opt := harbor.ListProjectsOptions{Name: utils.DefaultProjectName}
 	projects, _, errs := harborClient.Projects.ListProject(&opt)
@@ -121,7 +136,14 @@ func NewRepoWatcher(nodeName, nodeRole, repoAddr string, stopCh chan interface{}
 		watchInterval:defaultWatchInterval,
 		info:&ReporterInfo{
 			NodeName: nodeName,
-			NodeRole: nodeRole,
+			NodeInfo: &NodeInfo{
+				NodeName:nodeName,
+				NodeRole:nodeRole,
+				RepoAddr:repoAddr,
+				AdvertiseAddr:advAddr,
+				BindAddr:bindAddr,
+				Status:StatusActive,
+			},
 		},
 	}, nil
 }
