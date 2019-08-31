@@ -193,7 +193,7 @@ func GetChartVersion(c *gin.Context) {
 	}
 }
 
-// @Summary 推送指定Chart仓库的指定版本到远端仓库
+// @Summary 查询指定Version的参数Key-Value详情
 // @Accept  json
 // @Produce json
 // @Param cluster query string false "ClusterName"

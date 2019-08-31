@@ -246,7 +246,7 @@ paths:
           description: Internal Error
           schema:
             type: string
-      summary: 推送指定Chart仓库的指定版本到远端仓库
+      summary: 查询指定Version的参数Key-Value详情
   /api/v1/chart/{repo}/{version}/push:
     post:
       consumes:
