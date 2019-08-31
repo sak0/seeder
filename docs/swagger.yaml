@@ -226,6 +226,27 @@ paths:
           schema:
             type: string
       summary: 下载更新指定Chart仓库的指定版本到本地仓库
+  /api/v1/chart/{repo}/{version}/param:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: ClusterName
+        in: query
+        name: cluster
+        type: string
+      produces:
+      - application/json
+      responses:
+        "202":
+          description: Accepted
+          schema:
+            $ref: '#/definitions/models.ChartVersion'
+        "500":
+          description: Internal Error
+          schema:
+            type: string
+      summary: 推送指定Chart仓库的指定版本到远端仓库
   /api/v1/chart/{repo}/{version}/push:
     post:
       consumes:

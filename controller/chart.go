@@ -193,6 +193,26 @@ func GetChartVersion(c *gin.Context) {
 	}
 }
 
+// @Summary 推送指定Chart仓库的指定版本到远端仓库
+// @Accept  json
+// @Produce json
+// @Param cluster query string false "ClusterName"
+// @Success 202 {object} models.ChartVersion
+// @Failure 500 {string} string "Internal Error"
+// @Router /api/v1/chart/{repo}/{version}/param [get]
+func GetChartVersionParam(c *gin.Context) {
+	resp := Response{}
+	chartName := c.Param("id")
+	version := c.Param("version")
+	if chartName == "" || version == "" {
+		RespErr(ERRBADREQUEST, ERROR_INVALID_PARAMS, "must have chartName and version.", c)
+		return
+	}
+
+	//remoteNodeName := c.Query("ClusterName")
+	c.JSON(http.StatusOK, resp)
+}
+
 // @Summary 下载更新指定Chart仓库的指定版本到本地仓库
 // @Accept  json
 // @Produce json
