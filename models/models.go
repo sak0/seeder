@@ -70,6 +70,8 @@ type ChartRepo struct {
 	Home 			string		`json:"home" gorm:"type:varchar(50);column:home"`
 	VerifyStatus 	string		`json:"verify_status" gorm:"type:varchar(50);column:verify_status"`
 	Cached 			bool		`json:"cached" gorm:"type:bool;column:cached"`
+	CreationTime 	time.Time 	`json:"created" gorm:"type:timestamp;column:created"`
+	UpdateTime   	time.Time 	`json:"updated" gorm:"type:timestamp;column:updated"`
 }
 
 func (c ChartRepo) TableName() string{
@@ -86,6 +88,8 @@ type ChartVersion struct {
 	Digest 			string			`json:"digest" gorm:"type:varchar(255);column:digest"`
 	VerifyStatus 	string			`json:"verify_status" gorm:"type:varchar(50);column:verify_status"`
 	Cached 			bool			`json:"cached" gorm:"type:bool;column:cached"`
+	CreationTime 	time.Time 		`json:"created" gorm:"type:timestamp;column:created"`
+	UpdateTime   	time.Time 		`json:"updated" gorm:"type:timestamp;column:updated"`
 }
 
 func (c ChartVersion) TableName() string {

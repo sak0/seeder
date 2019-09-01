@@ -11,6 +11,9 @@ func GetAllVersions(page, pageSize int) ([]*ChartVersion, int, error) {
 	if page > 0 && pageSize > 0 {
 		db = db.Limit(pageSize).Offset((page - 1) * pageSize)
 	}
+
+	db = db.Order("created desc")
+
 	db = db.Find(&versions)
 	glog.V(5).Infof("db query version count %d", count)
 

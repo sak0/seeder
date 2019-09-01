@@ -49,6 +49,8 @@ func formatVersions(keepInfo repoer.ReporterInfo) []*models.ChartVersion {
 			Digest:chartVersion.Digest,
 			VerifyStatus:verifyStatusTrue,
 			Cached:true,
+			CreationTime:chartVersion.CreationTime,
+			UpdateTime:chartVersion.UpdateTime,
 		}
 		versions = append(versions, version)
 	}
@@ -68,6 +70,8 @@ func formatCharts(keepInfo repoer.ReporterInfo) []*models.ChartRepo {
 			Home:chartRepo.Home,
 			VerifyStatus:verifyStatusTrue,
 			Cached:true,
+			CreationTime:chartRepo.CreationTime,
+			UpdateTime:chartRepo.UpdateTime,
 		}
 		charts = append(charts, chart)
 	}
