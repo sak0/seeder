@@ -13,6 +13,7 @@ import (
 	"github.com/sak0/seeder/models"
 	"github.com/sak0/seeder/pkg/utils"
 	"github.com/sak0/seeder/pkg/transfer"
+	"github.com/sak0/go-harbor"
 )
 
 // @Summary 获取Chart仓库列表
@@ -209,7 +210,24 @@ func GetChartVersionParam(c *gin.Context) {
 		return
 	}
 
+	nodeInfo, err := models.GetNodeByName(utils.GetMyNodeName())
+	if err != nil {
+		RespErr(ERRINTERNALERR, ERROR_INVALID_PARAMS,
+			fmt.Sprintf("can not get registry information for node %s", utils.GetMyNodeName()), c)
+		return
+	}
+	harborCli := harbor.NewClient(nil, nodeInfo.RepoAddr, "admin", "Harbor12345")
+	detail, _, errs := harborCli.ChartRepos.GetChartVersionDetail(utils.DefaultProjectName, chartName, version)
+	if len(errs) > 0 {
+		RespErr(ERRINTERNALERR, ERROR_INVALID_PARAMS,
+			fmt.Sprintf("can not get version %s detail %v", version, errs[0]), c)
+		return
+	}
+
 	//remoteNodeName := c.Query("ClusterName")
+	resp.Code = "200"
+	resp.Message = "get version detail success"
+	resp.Data = detail.Values
 	c.JSON(http.StatusOK, resp)
 }
 
