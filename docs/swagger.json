@@ -193,21 +193,22 @@
                 }
             }
         },
-        "/api/v1/chart/{repo}/{version}/param": {
-            "get": {
+        "/api/v1/chart/{repo}/{version}/push": {
+            "post": {
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "summary": "查询指定Version的参数Key-Value详情",
+                "summary": "推送指定Chart仓库的指定版本到远端仓库",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ClusterName",
-                        "name": "cluster",
-                        "in": "query"
+                        "description": "remote",
+                        "name": "remote",
+                        "in": "query",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -226,22 +227,21 @@
                 }
             }
         },
-        "/api/v1/chart/{repo}/{version}/push": {
-            "post": {
+        "/api/v1/chartparams/{chart}/{version}": {
+            "get": {
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "summary": "推送指定Chart仓库的指定版本到远端仓库",
+                "summary": "查询指定Version的参数Key-Value详情",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "remote",
-                        "name": "remote",
-                        "in": "query",
-                        "required": true
+                        "description": "ClusterName",
+                        "name": "cluster",
+                        "in": "query"
                     }
                 ],
                 "responses": {

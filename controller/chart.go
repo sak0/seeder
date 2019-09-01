@@ -200,10 +200,10 @@ func GetChartVersion(c *gin.Context) {
 // @Param cluster query string false "ClusterName"
 // @Success 202 {object} models.ChartVersion
 // @Failure 500 {string} string "Internal Error"
-// @Router /api/v1/chart/{repo}/{version}/param [get]
+// @Router /api/v1/chartparams/{chart}/{version} [get]
 func GetChartVersionParam(c *gin.Context) {
 	resp := Response{}
-	chartName := c.Param("id")
+	chartName := c.Param("chart")
 	version := c.Param("version")
 	if chartName == "" || version == "" {
 		RespErr(ERRBADREQUEST, ERROR_INVALID_PARAMS, "must have chartName and version.", c)
@@ -226,7 +226,7 @@ func GetChartVersionParam(c *gin.Context) {
 
 	//remoteNodeName := c.Query("ClusterName")
 	resp.Code = "200"
-	resp.Message = "get version detail success"
+	resp.Message = fmt.Sprintf("get chart version %s/%s params success", chartName, version)
 	resp.Data = detail.Values
 	c.JSON(http.StatusOK, resp)
 }
