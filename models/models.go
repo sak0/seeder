@@ -61,6 +61,7 @@ func (t RepositoryTag) TableName() string {
 }
 
 type ChartRepo struct {
+	gorm.Model
 	OwnerNode 		string		`json:"owner_name" gorm:"type:varchar(50);column:owner_name"`
 	Name 			string		`json:"name" gorm:"type:varchar(50);column:name"`
 	VersionCount 	int64		`json:"version_count" gorm:"type:int;column:size"`
@@ -76,6 +77,7 @@ func (c ChartRepo) TableName() string{
 }
 
 type ChartVersion struct {
+	gorm.Model
 	Name 			string			`json:"name" gorm:"type:varchar(50);column:name"`
 	Version 		string			`json:"version" gorm:"type:varchar(50);column:version"`
 	Description		string			`json:"description" gorm:"type:varchar(255);column:description"`
