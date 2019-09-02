@@ -413,14 +413,21 @@ paths:
       - description: chart_name
         in: query
         name: chart
+        required: true
         type: string
       - description: version
         in: query
         name: version
+        required: true
         type: string
       - description: file_name
         in: query
         name: file
+        required: true
+        type: string
+      - description: ClusterName
+        in: query
+        name: cluster
         type: string
       produces:
       - application/json
@@ -434,6 +441,37 @@ paths:
           schema:
             type: string
       summary: 查询指定Version的文件详情，例如：README.md
+  /api/v1/versiondetail/filelist:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: chart_name
+        in: query
+        name: chart
+        required: true
+        type: string
+      - description: version
+        in: query
+        name: version
+        required: true
+        type: string
+      - description: ClusterName
+        in: query
+        name: cluster
+        type: string
+      produces:
+      - application/json
+      responses:
+        "202":
+          description: Accepted
+          schema:
+            $ref: '#/definitions/models.ChartVersion'
+        "500":
+          description: Internal Error
+          schema:
+            type: string
+      summary: 查询指定Version的文件列表
   /api/v1/versiondetail/params:
     get:
       consumes:

@@ -162,7 +162,8 @@ func main() {
 		}
 
 		v1.GET("/versiondetail/params", controller.GetChartVersionParam)
-		v1.GET("/versiondetail/file", controller.GetChartVersionFiles)
+		v1.GET("/versiondetail/filelist", controller.GetChartVersionFileList)
+		v1.GET("/versiondetail/file", controller.GetChartVersionFileContent)
 	}
 
 	glog.Fatal(r.Run("0.0.0.0:" + strconv.Itoa(PortIUse)))
