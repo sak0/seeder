@@ -60,7 +60,7 @@
                     {
                         "type": "string",
                         "description": "ClusterName",
-                        "name": "cluster",
+                        "name": "ClusterName",
                         "in": "query"
                     }
                 ],
@@ -117,7 +117,7 @@
                     {
                         "type": "string",
                         "description": "ClusterName",
-                        "name": "cluster",
+                        "name": "ClusterName",
                         "in": "query"
                     }
                 ],
@@ -486,7 +486,7 @@
                     {
                         "type": "string",
                         "description": "ClusterName",
-                        "name": "cluster",
+                        "name": "ClusterName",
                         "in": "query"
                     }
                 ],
@@ -533,7 +533,7 @@
                     {
                         "type": "string",
                         "description": "ClusterName",
-                        "name": "cluster",
+                        "name": "ClusterName",
                         "in": "query"
                     }
                 ],
@@ -580,7 +580,7 @@
                     {
                         "type": "string",
                         "description": "ClusterName",
-                        "name": "cluster",
+                        "name": "ClusterName",
                         "in": "query"
                     }
                 ],

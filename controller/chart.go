@@ -24,7 +24,7 @@ import (
 // @Param status query bool false "VerifyStatus"
 // @Param cached query bool false "Cached"
 // @Param chart_name query string false "chart_name"
-// @Param cluster query string false "ClusterName"
+// @Param ClusterName query string false "ClusterName"
 // @Success 200 {object} models.ChartRepo
 // @Failure 500 {string} string "Internal Error"
 // @Router /api/v1/chart [get]
@@ -110,7 +110,7 @@ func GetChartRepo(c *gin.Context) {
 // @Param pageSize query int false "PageSize"
 // @Param status query bool false "VerifyStatus"
 // @Param cached query bool false "Cached"
-// @Param cluster query string false "ClusterName"
+// @Param ClusterName query string false "ClusterName"
 // @Success 200 {object} models.ChartVersion
 // @Failure 500 {string} string "Internal Error"
 // @Router /api/v1/chart/{chartName}/versions [get]
@@ -202,7 +202,7 @@ func GetChartVersion(c *gin.Context) {
 // @Produce json
 // @Param chart_name query string true "chart_name"
 // @Param version query string true "version"
-// @Param cluster query string false "ClusterName"
+// @Param ClusterName query string false "ClusterName"
 // @Success 202 {object} models.ChartVersion
 // @Failure 500 {string} string "Internal Error"
 // @Router /api/v1/versiondetail/filelist [get]
@@ -291,7 +291,7 @@ func GetChartVersionFileList(c *gin.Context) {
 // @Param chart_name query string true "chart_name"
 // @Param version query string true "version"
 // @Param file_name query string true "file_name"
-// @Param cluster query string false "ClusterName"
+// @Param ClusterName query string false "ClusterName"
 // @Success 202 {object} models.ChartVersion
 // @Failure 500 {string} string "Internal Error"
 // @Router /api/v1/versiondetail/file [get]
@@ -385,7 +385,7 @@ func GetChartVersionFileContent(c *gin.Context) {
 // @Produce json
 // @Param chart_name query string true "chart_name"
 // @Param version query string true "version"
-// @Param cluster query string false "ClusterName"
+// @Param ClusterName query string false "ClusterName"
 // @Success 202 {object} models.ChartVersion
 // @Failure 500 {string} string "Internal Error"
 // @Router /api/v1/versiondetail/params [get]

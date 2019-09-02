@@ -151,7 +151,7 @@ paths:
         type: string
       - description: ClusterName
         in: query
-        name: cluster
+        name: ClusterName
         type: string
       produces:
       - application/json
@@ -188,7 +188,7 @@ paths:
         type: boolean
       - description: ClusterName
         in: query
-        name: cluster
+        name: ClusterName
         type: string
       produces:
       - application/json
@@ -427,7 +427,7 @@ paths:
         type: string
       - description: ClusterName
         in: query
-        name: cluster
+        name: ClusterName
         type: string
       produces:
       - application/json
@@ -458,7 +458,7 @@ paths:
         type: string
       - description: ClusterName
         in: query
-        name: cluster
+        name: ClusterName
         type: string
       produces:
       - application/json
@@ -489,7 +489,7 @@ paths:
         type: string
       - description: ClusterName
         in: query
-        name: cluster
+        name: ClusterName
         type: string
       produces:
       - application/json
