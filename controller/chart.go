@@ -197,7 +197,7 @@ func GetChartVersion(c *gin.Context) {
 	}
 }
 
-// @Summary 查询指定Version的文件详情，例如：README
+// @Summary 查询指定Version的文件详情，例如：README.md
 // @Accept  json
 // @Produce json
 // @Param chart query string false "chart_name"
@@ -208,6 +208,39 @@ func GetChartVersion(c *gin.Context) {
 // @Router /api/v1/versiondetail/file [get]
 func GetChartVersionFiles(c *gin.Context) {
 	resp := Response{}
+	chartName := c.Query("chart_name")
+	version := c.Query("version")
+	fileName := c.Query("file_name")
+	if chartName == "" || version == "" || fileName == "" {
+		RespErr(ERRBADREQUEST, ERROR_INVALID_PARAMS, "must have chart_name, version and file_name.", c)
+		return
+	}
+
+	nodeInfo, err := models.GetNodeByName(utils.GetMyNodeName())
+	if err != nil {
+		RespErr(ERRINTERNALERR, ERROR_INVALID_PARAMS,
+			fmt.Sprintf("can not get registry information for node %s", utils.GetMyNodeName()), c)
+		return
+	}
+	harborCli := harbor.NewClient(nil, nodeInfo.RepoAddr, "admin", "Harbor12345")
+	detail, _, errs := harborCli.ChartRepos.GetChartVersionDetail(utils.DefaultProjectName, chartName, version)
+	if len(errs) > 0 {
+		RespErr(ERRINTERNALERR, ERROR_INVALID_PARAMS,
+			fmt.Sprintf("can not get version %s detail %v", version, errs[0]), c)
+		return
+	}
+
+	resp.Message = fmt.Sprintf("can not find file %s in chart %s/%s", fileName, chartName, version)
+	resp.Code = ERRBADREQUEST + MYERRCODE + ERROR_INVALID_PARAMS
+	for fname, content := range detail.Files {
+		if fname == fileName {
+			resp.Code = "200"
+			resp.Data = content
+			resp.Message = fmt.Sprintf("get file %s content success in chart %s/%s", fileName, chartName, version)
+			break
+		}
+	}
+
 	c.JSON(http.StatusOK, resp)
 }
 

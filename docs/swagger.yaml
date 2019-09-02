@@ -433,7 +433,7 @@ paths:
           description: Internal Error
           schema:
             type: string
-      summary: 查询指定Version的文件详情，例如：README
+      summary: 查询指定Version的文件详情，例如：README.md
   /api/v1/versiondetail/params:
     get:
       consumes:

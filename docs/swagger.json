@@ -460,7 +460,7 @@
                 "produces": [
                     "application/json"
                 ],
-                "summary": "查询指定Version的文件详情，例如：README",
+                "summary": "查询指定Version的文件详情，例如：README.md",
                 "parameters": [
                     {
                         "type": "string",
