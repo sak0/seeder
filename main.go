@@ -58,7 +58,7 @@ func init() {
 	flag.BoolVar(&useNat, "use-nat", false, "if use nat access.")
 	flag.Parse()
 
-	utils.SetNodeName(myName)
+	utils.SetNodeName(myName, role)
 }
 
 // @title Seeder API

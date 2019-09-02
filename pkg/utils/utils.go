@@ -24,13 +24,15 @@ const (
 
 var (
 	defaultHTTPTransport, secureHTTPTransport, insecureHTTPTransport *http.Transport
-	MyNodeName string
-	HarborUser string
-	HarborPass string
+	MyNodeName 	string
+	HarborUser 	string
+	HarborPass 	string
+	MyRole 		string
 )
 
-func SetNodeName(myName string) {
+func SetNodeName(myName, myRole string) {
 	MyNodeName = myName
+	MyRole = myRole
 }
 
 func GetMyNodeName() string {

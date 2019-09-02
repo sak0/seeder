@@ -9,6 +9,7 @@ import (
 	"github.com/sak0/seeder/pkg/cluster"
 	"github.com/sak0/seeder/pkg/repoer"
 	"github.com/sak0/seeder/models"
+	"github.com/sak0/seeder/pkg/utils"
 )
 
 const (
@@ -425,7 +426,13 @@ func (k *LocalKeeper) syncMasterVersions(masterInfo repoer.ReporterInfo) {
 }
 
 func (k *LocalKeeper) syncLocalVersions(keepInfo repoer.ReporterInfo) {
-	remoteVersions := formatVersions(keepInfo, true, verifyStatusFalse)
+	var verifyStatus string
+	if utils.MyRole == "master" {
+		verifyStatus = verifyStatusTrue
+	} else {
+		verifyStatus = verifyStatusFalse
+	}
+	remoteVersions := formatVersions(keepInfo, true, verifyStatus)
 	localVersions, err := k.getLocalVersions()
 	if err != nil {
 		glog.V(2).Infof("get local charts failed: %v", err)
@@ -438,18 +445,20 @@ func (k *LocalKeeper) syncLocalVersions(keepInfo repoer.ReporterInfo) {
 		k.addVersion(versionAdd)
 	}
 
-	localUnCachedVersions, err := k.getLocalUnCachedVersions()
-	if err != nil {
-		glog.V(2).Infof("get local unCached versions failed: %v", err)
-		return
-	}
-	glog.V(2).Infof("[remoteVersions] %v", remoteVersions)
-	glog.V(2).Infof("[localUnCachedVersions] %v", localUnCachedVersions)
-	for _, localUnCachedVersion := range localUnCachedVersions {
-		for _, remoteVersion := range remoteVersions {
-			if localUnCachedVersion.Version == remoteVersion.Version &&
-				localUnCachedVersion.Name == remoteVersion.Name {
+	if utils.MyRole == "follower" {
+		localUnCachedVersions, err := k.getLocalUnCachedVersions()
+		if err != nil {
+			glog.V(2).Infof("get local unCached versions failed: %v", err)
+			return
+		}
+		glog.V(2).Infof("[remoteVersions] %v", remoteVersions)
+		glog.V(2).Infof("[localUnCachedVersions] %v", localUnCachedVersions)
+		for _, localUnCachedVersion := range localUnCachedVersions {
+			for _, remoteVersion := range remoteVersions {
+				if localUnCachedVersion.Version == remoteVersion.Version &&
+					localUnCachedVersion.Name == remoteVersion.Name {
 					k.markVersionCached(localUnCachedVersion.Name, localUnCachedVersion.Version)
+				}
 			}
 		}
 	}
