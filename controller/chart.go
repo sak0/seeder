@@ -122,7 +122,7 @@ func GetChartVersion(c *gin.Context) {
 		RespErr(ERRBADREQUEST, ERROR_INVALID_PARAMS, "must have chartRepo name", c)
 		return
 	}
-	glog.V(5).Infof("ctr: get versions for chart %v", chartName)
+	glog.V(3).Infof("ctr: get versions for chart %v", chartName)
 
 	clusterName := c.Query("ClusterName")
 	glog.V(3).Infof("get chart version for remote cluster: %s", clusterName)
@@ -155,7 +155,7 @@ func GetChartVersion(c *gin.Context) {
 			RespErr(ERRBADREQUEST, ERROR_INVALID_PARAMS, err.Error(), c)
 			return
 		}
-		glog.V(2).Infof("get version from remote edge: %s", clusterName)
+		glog.V(3).Infof("get version from remote edge: %s", clusterName)
 
 		client := http.Client{
 			Transport:utils.GetHTTPTransport(true),
@@ -246,7 +246,7 @@ func GetChartVersionFileList(c *gin.Context) {
 			RespErr(ERRBADREQUEST, ERROR_INVALID_PARAMS, err.Error(), c)
 			return
 		}
-		glog.V(5).Infof("get fileList from remote edge: %s", clusterName)
+		glog.V(3).Infof("get fileList from remote edge: %s", clusterName)
 
 		client := http.Client{
 			Transport:utils.GetHTTPTransport(true),
@@ -341,7 +341,7 @@ func GetChartVersionFileContent(c *gin.Context) {
 			RespErr(ERRBADREQUEST, ERROR_INVALID_PARAMS, err.Error(), c)
 			return
 		}
-		glog.V(5).Infof("get fileList from remote edge: %s", clusterName)
+		glog.V(2).Infof("get file %s content from remote edge: %s", fileName, clusterName)
 
 		client := http.Client{
 			Transport:utils.GetHTTPTransport(true),
@@ -401,6 +401,8 @@ func GetChartVersionParam(c *gin.Context) {
 	clusterName := c.Query("ClusterName")
 
 	if clusterName == "" {
+		glog.V(3).Infof("get local params info")
+
 		nodeInfo, err := models.GetNodeByName(utils.GetMyNodeName())
 		if err != nil {
 			RespErr(ERRINTERNALERR, ERROR_INVALID_PARAMS,
@@ -426,7 +428,7 @@ func GetChartVersionParam(c *gin.Context) {
 			RespErr(ERRBADREQUEST, ERROR_INVALID_PARAMS, err.Error(), c)
 			return
 		}
-		glog.V(5).Infof("get fileList from remote edge: %s", clusterName)
+		glog.V(3).Infof("get params from remote edge: %s", clusterName)
 
 		client := http.Client{
 			Transport:utils.GetHTTPTransport(true),
