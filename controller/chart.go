@@ -290,7 +290,7 @@ func GetChartVersionFileList(c *gin.Context) {
 // @Produce json
 // @Param chart query string true "chart_name"
 // @Param version query string true "version"
-// @Param file query string true "file_name"
+// @Param file_name query string true "file_name"
 // @Param cluster query string false "ClusterName"
 // @Success 202 {object} models.ChartVersion
 // @Failure 500 {string} string "Internal Error"
@@ -383,8 +383,9 @@ func GetChartVersionFileContent(c *gin.Context) {
 // @Summary 查询指定Version的参数Key-Value详情
 // @Accept  json
 // @Produce json
-// @Param chart query string false "chart_name"
-// @Param version query string false "version"
+// @Param chart query string true "chart_name"
+// @Param version query string true "version"
+// @Param cluster query string false "ClusterName"
 // @Success 202 {object} models.ChartVersion
 // @Failure 500 {string} string "Internal Error"
 // @Router /api/v1/versiondetail/params [get]
@@ -397,25 +398,71 @@ func GetChartVersionParam(c *gin.Context) {
 		return
 	}
 
-	nodeInfo, err := models.GetNodeByName(utils.GetMyNodeName())
-	if err != nil {
-		RespErr(ERRINTERNALERR, ERROR_INVALID_PARAMS,
-			fmt.Sprintf("can not get registry information for node %s", utils.GetMyNodeName()), c)
-		return
-	}
-	harborCli := harbor.NewClient(nil, nodeInfo.RepoAddr, "admin", "Harbor12345")
-	detail, _, errs := harborCli.ChartRepos.GetChartVersionDetail(utils.DefaultProjectName, chartName, version)
-	if len(errs) > 0 {
-		RespErr(ERRINTERNALERR, ERROR_INVALID_PARAMS,
-			fmt.Sprintf("can not get version %s detail %v", version, errs[0]), c)
-		return
-	}
+	clusterName := c.Query("ClusterName")
 
-	//remoteNodeName := c.Query("ClusterName")
-	resp.Code = "200"
-	resp.Message = fmt.Sprintf("get chart version %s/%s params success", chartName, version)
-	resp.Data = detail.Values
-	c.JSON(http.StatusOK, resp)
+	if clusterName == "" {
+		nodeInfo, err := models.GetNodeByName(utils.GetMyNodeName())
+		if err != nil {
+			RespErr(ERRINTERNALERR, ERROR_INVALID_PARAMS,
+				fmt.Sprintf("can not get registry information for node %s", utils.GetMyNodeName()), c)
+			return
+		}
+		harborCli := harbor.NewClient(nil, nodeInfo.RepoAddr, "admin", "Harbor12345")
+		detail, _, errs := harborCli.ChartRepos.GetChartVersionDetail(utils.DefaultProjectName, chartName, version)
+		if len(errs) > 0 {
+			RespErr(ERRINTERNALERR, ERROR_INVALID_PARAMS,
+				fmt.Sprintf("can not get version %s detail %v", version, errs[0]), c)
+			return
+		}
+
+		resp.Code = "200"
+		resp.Message = fmt.Sprintf("get chart version %s/%s params success", chartName, version)
+		resp.Data = detail.Values
+		c.JSON(http.StatusOK, resp)
+	} else {
+		node, err := models.GetNodeByName(clusterName)
+		if err != nil {
+			glog.V(2).Infof("get node %s info failed: %v", clusterName, node)
+			RespErr(ERRBADREQUEST, ERROR_INVALID_PARAMS, err.Error(), c)
+			return
+		}
+		glog.V(5).Infof("get fileList from remote edge: %s", clusterName)
+
+		client := http.Client{
+			Transport:utils.GetHTTPTransport(true),
+		}
+
+		var url string
+		url = fmt.Sprintf("http://%s/api/v1/versiondetail/params?chart_name=%s&version=%s",
+			node.AdvertiseAddr, chartName, version)
+
+		req, err := http.NewRequest(http.MethodGet, url, nil)
+		if err != nil {
+			RespErr(ERRINTERNALERR, ERROR_INVALID_PARAMS, err.Error(), c)
+			return
+		}
+
+		var remoteResp Response
+		remoteRawResp, err := client.Do(req)
+		if err != nil {
+			RespErr(ERRINTERNALERR, ERROR_INVALID_PARAMS, err.Error(), c)
+			return
+		}
+		data, err := ioutil.ReadAll(remoteRawResp.Body)
+		if err != nil {
+			RespErr(ERRINTERNALERR, ERROR_INVALID_PARAMS, err.Error(), c)
+			return
+		}
+		remoteRawResp.Body.Close()
+
+		err = json.Unmarshal(data, &remoteResp)
+		if err != nil {
+			RespErr(ERRINTERNALERR, ERROR_INVALID_PARAMS, err.Error(), c)
+			return
+		}
+
+		c.JSON(http.StatusOK, remoteResp)
+	}
 }
 
 // @Summary 下载更新指定Chart仓库的指定版本到本地仓库

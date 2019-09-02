@@ -479,7 +479,7 @@
                     {
                         "type": "string",
                         "description": "file_name",
-                        "name": "file",
+                        "name": "file_name",
                         "in": "query",
                         "required": true
                     },
@@ -567,12 +567,20 @@
                         "type": "string",
                         "description": "chart_name",
                         "name": "chart",
-                        "in": "query"
+                        "in": "query",
+                        "required": true
                     },
                     {
                         "type": "string",
                         "description": "version",
                         "name": "version",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "ClusterName",
+                        "name": "cluster",
                         "in": "query"
                     }
                 ],

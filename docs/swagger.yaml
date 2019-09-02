@@ -422,7 +422,7 @@ paths:
         type: string
       - description: file_name
         in: query
-        name: file
+        name: file_name
         required: true
         type: string
       - description: ClusterName
@@ -480,10 +480,16 @@ paths:
       - description: chart_name
         in: query
         name: chart
+        required: true
         type: string
       - description: version
         in: query
         name: version
+        required: true
+        type: string
+      - description: ClusterName
+        in: query
+        name: cluster
         type: string
       produces:
       - application/json
