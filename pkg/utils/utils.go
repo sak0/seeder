@@ -22,9 +22,12 @@ const (
 	DefaultProjectName 		= "edge-cloud"
 )
 
-var defaultHTTPTransport, secureHTTPTransport, insecureHTTPTransport *http.Transport
-
-var MyNodeName string
+var (
+	defaultHTTPTransport, secureHTTPTransport, insecureHTTPTransport *http.Transport
+	MyNodeName string
+	HarborUser string
+	HarborPass string
+)
 
 func SetNodeName(myName string) {
 	MyNodeName = myName
@@ -84,6 +87,19 @@ func MustGetMyIpAddr() string {
 		panic(err)
 	}
 	return ips[0]
+}
+
+func HarborAuth() error {
+	harborUser := os.Getenv("HARBOR_USER")
+	harborPasswd := os.Getenv("HARBOR_PASSWD")
+	if harborUser == "" || harborPasswd == "" {
+		return fmt.Errorf("Env HARBOR_USER and HARBOR_PASSWD should exists.\n")
+	}
+
+	HarborUser = harborUser
+	HarborPass = harborPasswd
+
+	return nil
 }
 
 func ServiceRegister(myName string, myPort int, healthURL string) error {

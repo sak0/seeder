@@ -208,7 +208,7 @@ func (t *Transfer) copy(name, version string, override bool) error {
 }
 
 func mustHarborClient(repoAddr string)(*harbor.Client, error) {
-	client := harbor.NewClient(nil, repoAddr, "admin", "Harbor12345")
+	client := harbor.NewClient(nil, repoAddr, utils.HarborUser, utils.HarborPass)
 	opt := harbor.ListProjectsOptions{Name: utils.DefaultProjectName}
 	_, _, errs := client.Projects.ListProject(&opt)
 	if len(errs) > 0 {
@@ -220,7 +220,7 @@ func mustHarborClient(repoAddr string)(*harbor.Client, error) {
 func NewTransfer(srcAddr, dstAddr string) (*Transfer, error) {
 	transport := utils.GetHTTPTransport(true)
 	transport.Proxy =  func(req *http.Request) (*url.URL, error) {
-		req.SetBasicAuth("admin", "Harbor12345")
+		req.SetBasicAuth(utils.HarborUser, utils.HarborPass)
 		return nil, nil
 	}
 

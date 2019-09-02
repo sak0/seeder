@@ -223,7 +223,7 @@ func GetChartVersionFileList(c *gin.Context) {
 				fmt.Sprintf("can not get registry information for node %s", utils.GetMyNodeName()), c)
 			return
 		}
-		harborCli := harbor.NewClient(nil, nodeInfo.RepoAddr, "admin", "Harbor12345")
+		harborCli := harbor.NewClient(nil, nodeInfo.RepoAddr, utils.HarborUser, utils.HarborPass)
 		detail, _, errs := harborCli.ChartRepos.GetChartVersionDetail(utils.DefaultProjectName, chartName, version)
 		if len(errs) > 0 {
 			RespErr(ERRINTERNALERR, ERROR_INVALID_PARAMS,
@@ -314,7 +314,7 @@ func GetChartVersionFileContent(c *gin.Context) {
 				fmt.Sprintf("can not get registry information for node %s", utils.GetMyNodeName()), c)
 			return
 		}
-		harborCli := harbor.NewClient(nil, nodeInfo.RepoAddr, "admin", "Harbor12345")
+		harborCli := harbor.NewClient(nil, nodeInfo.RepoAddr, utils.HarborUser, utils.HarborPass)
 		detail, _, errs := harborCli.ChartRepos.GetChartVersionDetail(utils.DefaultProjectName, chartName, version)
 		if len(errs) > 0 {
 			RespErr(ERRINTERNALERR, ERROR_INVALID_PARAMS,
@@ -409,7 +409,7 @@ func GetChartVersionParam(c *gin.Context) {
 				fmt.Sprintf("can not get registry information for node %s", utils.GetMyNodeName()), c)
 			return
 		}
-		harborCli := harbor.NewClient(nil, nodeInfo.RepoAddr, "admin", "Harbor12345")
+		harborCli := harbor.NewClient(nil, nodeInfo.RepoAddr, utils.HarborUser, utils.HarborPass)
 		detail, _, errs := harborCli.ChartRepos.GetChartVersionDetail(utils.DefaultProjectName, chartName, version)
 		if len(errs) > 0 {
 			RespErr(ERRINTERNALERR, ERROR_INVALID_PARAMS,

@@ -122,7 +122,7 @@ func (w *RepoWatcher) doLoop() {
 
 func NewRepoWatcher(nodeName, nodeRole, repoAddr, advAddr, bindAddr string,
 			stopCh chan interface{}) (*RepoWatcher, error){
-	harborClient := harbor.NewClient(nil, repoAddr,"admin","Harbor12345")
+	harborClient := harbor.NewClient(nil, repoAddr,utils.HarborUser,utils.HarborPass)
 	opt := harbor.ListProjectsOptions{Name: utils.DefaultProjectName}
 	projects, _, errs := harborClient.Projects.ListProject(&opt)
 	if len(errs) > 0 {

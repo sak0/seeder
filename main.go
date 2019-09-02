@@ -76,6 +76,10 @@ func init() {
 // @host 172.16.24.200:15000
 // @BasePath /
 func main() {
+	if err := utils.HarborAuth(); err != nil {
+		panic(err)
+	}
+
 	myIp, err := utils.GetMyIpAddr()
 	if err != nil {
 		panic(err)
