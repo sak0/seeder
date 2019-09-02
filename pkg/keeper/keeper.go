@@ -37,7 +37,7 @@ func formatNode(keepInfo repoer.ReporterInfo) (*models.SeederNode, error) {
 	}, nil
 }
 
-func formatVersions(keepInfo repoer.ReporterInfo) []*models.ChartVersion {
+func formatVersions(keepInfo repoer.ReporterInfo, cached bool, verifyStatus string) []*models.ChartVersion {
 	var versions []*models.ChartVersion
 	for _, chartVersion := range keepInfo.Versions {
 		version := &models.ChartVersion {
@@ -47,8 +47,8 @@ func formatVersions(keepInfo repoer.ReporterInfo) []*models.ChartVersion {
 			AppVersion:chartVersion.AppVersion,
 			Url:chartVersion.Urls[0],
 			Digest:chartVersion.Digest,
-			VerifyStatus:verifyStatusTrue,
-			Cached:true,
+			VerifyStatus:verifyStatus,
+			Cached:cached,
 			CreationTime:chartVersion.CreationTime,
 			UpdateTime:chartVersion.UpdateTime,
 		}
@@ -233,12 +233,35 @@ func (k *LocalKeeper) getKeepInfo() (repoer.ReporterInfo, error){
 	return keepInfo, nil
 }
 
+func (k *LocalKeeper) getMasterInfo() (repoer.ReporterInfo, error) {
+	clusterInfo := k.getClusterInfo()
+
+	masters, err := models.GetNodesByRole("master")
+	if err != nil {
+		return repoer.ReporterInfo{}, err
+	}
+
+	masterInfo, ok := clusterInfo[masters[0].ClusterName]
+	if !ok {
+		return repoer.ReporterInfo{}, fmt.Errorf(fmt.Sprintf("miss %s info from master", masters[0].ClusterName))
+	}
+	return masterInfo, nil
+}
+
 func (k *LocalKeeper) getLocalNodes() ([]*models.SeederNode, error) {
 	nodes, _, err := models.GetSeederNodes(0, 0)
 	if err != nil {
 		return nil, err
 	}
 	return nodes, nil
+}
+
+func (k *LocalKeeper) getLocalUnCachedVersions() ([]*models.ChartVersion, error) {
+	versions, _, err := models.GetUnCachedVersions(0, 0, false)
+	if err != nil {
+		return nil, err
+	}
+	return versions, nil
 }
 
 func (k *LocalKeeper) getLocalVersions() ([]*models.ChartVersion, error) {
@@ -295,6 +318,13 @@ func (k *LocalKeeper) addVersion(version *models.ChartVersion) {
 	}
 }
 
+func (k *LocalKeeper) markVersionCached(chartName, version string) {
+	glog.V(2).Infof("UPDATE VERSION CACHED: %s/%s", chartName, version)
+	if err := models.UpdateVersionCached(chartName, version); err != nil {
+		glog.V(2).Infof("update version failed: %v", err)
+	}
+}
+
 func (k *LocalKeeper) addChart(chart *models.ChartRepo) {
 	glog.V(2).Infof("ADD CHART: %v", chart)
 	if err := models.CreateChart(chart); err != nil {
@@ -320,8 +350,8 @@ func (k *LocalKeeper) syncNode(keepInfo repoer.ReporterInfo) {
 		glog.V(2).Infof("get local nodes failed: %v", err)
 		return
 	}
-	glog.V(5).Infof("[remoteNode] %v", remoteNode)
-	glog.V(5).Infof("[localNodes] %v", localNodes)
+	glog.V(2).Infof("[remoteNode] %v", remoteNode)
+	glog.V(2).Infof("[localNodes] %v", localNodes)
 	nodeAdds, _, _ := diffNodes(remoteNode, localNodes)
 	for _, nodeAdd := range nodeAdds {
 		k.addNode(nodeAdd)
@@ -373,8 +403,29 @@ func (k *LocalKeeper) syncCharts(keepInfo repoer.ReporterInfo) {
 	}
 }
 
-func (k *LocalKeeper) syncVersions(keepInfo repoer.ReporterInfo) {
-	remoteVersions := formatVersions(keepInfo)
+func (k *LocalKeeper) syncVersions(keepInfo, masterInfo repoer.ReporterInfo) {
+	k.syncLocalVersions(keepInfo)
+	k.syncMasterVersions(masterInfo)
+}
+
+func (k *LocalKeeper) syncMasterVersions(masterInfo repoer.ReporterInfo) {
+	masterVersions := formatVersions(masterInfo, false, verifyStatusTrue)
+	localVersions, err := k.getLocalVersions()
+	if err != nil {
+		glog.V(2).Infof("get local charts failed: %v", err)
+		return
+	}
+
+	glog.V(5).Infof("[masterVersions] %v", masterVersions)
+	glog.V(5).Infof("[localVersions] %v", localVersions)
+	versionsAdd, _, _ := diffVersions(masterVersions, localVersions)
+	for _, versionAdd := range versionsAdd {
+		k.addVersion(versionAdd)
+	}
+}
+
+func (k *LocalKeeper) syncLocalVersions(keepInfo repoer.ReporterInfo) {
+	remoteVersions := formatVersions(keepInfo, true, verifyStatusFalse)
 	localVersions, err := k.getLocalVersions()
 	if err != nil {
 		glog.V(2).Infof("get local charts failed: %v", err)
@@ -386,27 +437,56 @@ func (k *LocalKeeper) syncVersions(keepInfo repoer.ReporterInfo) {
 	for _, versionAdd := range versionsAdd {
 		k.addVersion(versionAdd)
 	}
+
+	localUnCachedVersions, err := k.getLocalUnCachedVersions()
+	if err != nil {
+		glog.V(2).Infof("get local unCached versions failed: %v", err)
+		return
+	}
+	glog.V(2).Infof("[remoteVersions] %v", remoteVersions)
+	glog.V(2).Infof("[localUnCachedVersions] %v", localUnCachedVersions)
+	for _, localUnCachedVersion := range localUnCachedVersions {
+		for _, remoteVersion := range remoteVersions {
+			if localUnCachedVersion.Version == remoteVersion.Version &&
+				localUnCachedVersion.Name == remoteVersion.Name {
+					k.markVersionCached(localUnCachedVersion.Name, localUnCachedVersion.Version)
+			}
+		}
+	}
+}
+
+func (k *LocalKeeper) syncUnCachedCharts(keepInfo, masterInfo repoer.ReporterInfo) {
+
+}
+
+func (k *LocalKeeper) syncUnCachedVersions(keepInfo, masterInfo repoer.ReporterInfo) {
+
 }
 
 func (k *LocalKeeper) doSync() {
+	clusterInfo := k.getClusterInfo()
+	for _, info := range clusterInfo {
+		k.syncNode(info)
+	}
+
 	keepInfo, err := k.getKeepInfo()
 	if err != nil {
 		glog.V(2).Infof("get keep info failed: %v", err)
 		return
 	}
-
 	glog.V(5).Infof("keeper sync: %v", keepInfo)
+
+	masterInfo, err := k.getMasterInfo()
+	if err != nil {
+		glog.V(2).Infof("get master info failed: %v", err)
+		return
+	}
 
 	{
 		k.syncRepos(keepInfo)
 		k.syncTags(keepInfo)
 		k.syncCharts(keepInfo)
-		k.syncVersions(keepInfo)
-	}
-
-	clusterInfo := k.getClusterInfo()
-	for _, info := range clusterInfo {
-		k.syncNode(info)
+		k.syncVersions(keepInfo, masterInfo)
 	}
 }
 

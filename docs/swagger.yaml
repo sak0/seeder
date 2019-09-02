@@ -147,7 +147,7 @@ paths:
         type: boolean
       - description: chart_name
         in: query
-        name: chart
+        name: chart_name
         type: string
       - description: ClusterName
         in: query
@@ -412,7 +412,7 @@ paths:
       parameters:
       - description: chart_name
         in: query
-        name: chart
+        name: chart_name
         required: true
         type: string
       - description: version
@@ -448,7 +448,7 @@ paths:
       parameters:
       - description: chart_name
         in: query
-        name: chart
+        name: chart_name
         required: true
         type: string
       - description: version
@@ -479,7 +479,7 @@ paths:
       parameters:
       - description: chart_name
         in: query
-        name: chart
+        name: chart_name
         required: true
         type: string
       - description: version

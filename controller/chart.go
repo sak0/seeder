@@ -23,7 +23,7 @@ import (
 // @Param pageSize query int false "PageSize"
 // @Param status query bool false "VerifyStatus"
 // @Param cached query bool false "Cached"
-// @Param chart query string false "chart_name"
+// @Param chart_name query string false "chart_name"
 // @Param cluster query string false "ClusterName"
 // @Success 200 {object} models.ChartRepo
 // @Failure 500 {string} string "Internal Error"
@@ -200,7 +200,7 @@ func GetChartVersion(c *gin.Context) {
 // @Summary 查询指定Version的文件列表
 // @Accept  json
 // @Produce json
-// @Param chart query string true "chart_name"
+// @Param chart_name query string true "chart_name"
 // @Param version query string true "version"
 // @Param cluster query string false "ClusterName"
 // @Success 202 {object} models.ChartVersion
@@ -288,7 +288,7 @@ func GetChartVersionFileList(c *gin.Context) {
 // @Summary 查询指定Version的文件详情，例如：README.md
 // @Accept  json
 // @Produce json
-// @Param chart query string true "chart_name"
+// @Param chart_name query string true "chart_name"
 // @Param version query string true "version"
 // @Param file_name query string true "file_name"
 // @Param cluster query string false "ClusterName"
@@ -383,7 +383,7 @@ func GetChartVersionFileContent(c *gin.Context) {
 // @Summary 查询指定Version的参数Key-Value详情
 // @Accept  json
 // @Produce json
-// @Param chart query string true "chart_name"
+// @Param chart_name query string true "chart_name"
 // @Param version query string true "version"
 // @Param cluster query string false "ClusterName"
 // @Success 202 {object} models.ChartVersion
