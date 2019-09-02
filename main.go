@@ -161,7 +161,8 @@ func main() {
 			chart.POST(":id/:version/push", controller.PushChartVersion)
 		}
 
-		v1.GET("/chartparams/:chart/:version", controller.GetChartVersionParam)
+		v1.GET("/versiondetail/params", controller.GetChartVersionParam)
+		v1.GET("/versiondetail/files", controller.GetChartVersionFiles)
 	}
 
 	glog.Fatal(r.Run("0.0.0.0:" + strconv.Itoa(PortIUse)))

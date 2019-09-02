@@ -2,10 +2,14 @@ package models
 
 import "github.com/golang/glog"
 
-func GetAllCharts(page, pageSize int) ([]*ChartRepo, int, error) {
+func GetAllCharts(page, pageSize int, chartName string) ([]*ChartRepo, int, error) {
 	var count int
 	var charts []*ChartRepo
 	db := Db.Model(&ChartRepo{})
+
+	if chartName != "" {
+		db = db.Where("name = ?", chartName)
+	}
 
 	db = db.Count(&count)
 	if page > 0 && pageSize > 0 {

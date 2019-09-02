@@ -23,6 +23,7 @@ import (
 // @Param pageSize query int false "PageSize"
 // @Param status query bool false "VerifyStatus"
 // @Param cached query bool false "Cached"
+// @Param chart query string false "chart_name"
 // @Param cluster query string false "ClusterName"
 // @Success 200 {object} models.ChartRepo
 // @Failure 500 {string} string "Internal Error"
@@ -35,9 +36,10 @@ func GetChartRepo(c *gin.Context) {
 
 	page, _ := strconv.Atoi(c.Query("Page"))
 	pageSize, _ := strconv.Atoi(c.Query("PageSize"))
+	chartName := c.Query("chart_name")
 
 	if clusterName == "" {
-		charts, count, err := models.GetAllCharts(page, pageSize)
+		charts, count, err := models.GetAllCharts(page, pageSize, chartName)
 		if err != nil {
 			RespErr(ERRBADREQUEST, ERROR_INVALID_PARAMS, "get chart failed.", c)
 			return
@@ -66,9 +68,10 @@ func GetChartRepo(c *gin.Context) {
 
 		var url string
 		if pageSize > 0 && page > 0 {
-			url = fmt.Sprintf("http://%s/api/v1/chart?page=%d&page_size=%d", node.AdvertiseAddr, page, pageSize)
+			url = fmt.Sprintf("http://%s/api/v1/chart?page=%d&page_size=%d&chart_name=%s",
+				node.AdvertiseAddr, page, pageSize, chartName)
 		} else {
-			url = fmt.Sprintf("http://%s/api/v1/chart", node.AdvertiseAddr)
+			url = fmt.Sprintf("http://%s/api/v1/chart?chart_name=%s", node.AdvertiseAddr, chartName)
 		}
 		req, err := http.NewRequest(http.MethodGet, url, nil)
 		if err != nil {
@@ -194,19 +197,34 @@ func GetChartVersion(c *gin.Context) {
 	}
 }
 
+// @Summary 查询指定Version的文件详情，例如：README
+// @Accept  json
+// @Produce json
+// @Param chart query string false "chart_name"
+// @Param version query string false "version"
+// @Param file query string false "file_name"
+// @Success 202 {object} models.ChartVersion
+// @Failure 500 {string} string "Internal Error"
+// @Router /api/v1/versiondetail/file [get]
+func GetChartVersionFiles(c *gin.Context) {
+	resp := Response{}
+	c.JSON(http.StatusOK, resp)
+}
+
 // @Summary 查询指定Version的参数Key-Value详情
 // @Accept  json
 // @Produce json
-// @Param cluster query string false "ClusterName"
+// @Param chart query string false "chart_name"
+// @Param version query string false "version"
 // @Success 202 {object} models.ChartVersion
 // @Failure 500 {string} string "Internal Error"
-// @Router /api/v1/chartparams/{chart}/{version} [get]
+// @Router /api/v1/versiondetail/params [get]
 func GetChartVersionParam(c *gin.Context) {
 	resp := Response{}
-	chartName := c.Param("chart")
-	version := c.Param("version")
+	chartName := c.Query("chart_name")
+	version := c.Query("version")
 	if chartName == "" || version == "" {
-		RespErr(ERRBADREQUEST, ERROR_INVALID_PARAMS, "must have chartName and version.", c)
+		RespErr(ERRBADREQUEST, ERROR_INVALID_PARAMS, "must have chart_name and version.", c)
 		return
 	}
 

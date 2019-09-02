@@ -4,6 +4,8 @@ definitions:
     properties:
       cached:
         type: boolean
+      created:
+        type: string
       home:
         type: string
       icon:
@@ -13,6 +15,10 @@ definitions:
       name:
         type: string
       owner_name:
+        type: string
+      type:
+        type: string
+      updated:
         type: string
       verify_status:
         type: string
@@ -25,11 +31,17 @@ definitions:
         type: string
       cached:
         type: boolean
+      created:
+        type: string
       description:
         type: string
       digest:
         type: string
       name:
+        type: string
+      type:
+        type: string
+      updated:
         type: string
       url:
         type: string
@@ -133,6 +145,10 @@ paths:
         in: query
         name: cached
         type: boolean
+      - description: chart_name
+        in: query
+        name: chart
+        type: string
       - description: ClusterName
         in: query
         name: cluster
@@ -248,27 +264,6 @@ paths:
           schema:
             type: string
       summary: 推送指定Chart仓库的指定版本到远端仓库
-  /api/v1/chartparams/{chart}/{version}:
-    get:
-      consumes:
-      - application/json
-      parameters:
-      - description: ClusterName
-        in: query
-        name: cluster
-        type: string
-      produces:
-      - application/json
-      responses:
-        "202":
-          description: Accepted
-          schema:
-            $ref: '#/definitions/models.ChartVersion'
-        "500":
-          description: Internal Error
-          schema:
-            type: string
-      summary: 查询指定Version的参数Key-Value详情
   /api/v1/cluster:
     get:
       consumes:
@@ -410,4 +405,58 @@ paths:
           schema:
             type: string
       summary: 获取单个镜像仓库的tag列表
+  /api/v1/versiondetail/file:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: chart_name
+        in: query
+        name: chart
+        type: string
+      - description: version
+        in: query
+        name: version
+        type: string
+      - description: file_name
+        in: query
+        name: file
+        type: string
+      produces:
+      - application/json
+      responses:
+        "202":
+          description: Accepted
+          schema:
+            $ref: '#/definitions/models.ChartVersion'
+        "500":
+          description: Internal Error
+          schema:
+            type: string
+      summary: 查询指定Version的文件详情，例如：README
+  /api/v1/versiondetail/params:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: chart_name
+        in: query
+        name: chart
+        type: string
+      - description: version
+        in: query
+        name: version
+        type: string
+      produces:
+      - application/json
+      responses:
+        "202":
+          description: Accepted
+          schema:
+            $ref: '#/definitions/models.ChartVersion'
+        "500":
+          description: Internal Error
+          schema:
+            type: string
+      summary: 查询指定Version的参数Key-Value详情
 swagger: "2.0"
