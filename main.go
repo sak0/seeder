@@ -3,11 +3,13 @@ package main
 import (
 	"flag"
 	"fmt"
+	"os"
 	"strconv"
 	"time"
 
 	"github.com/golang/glog"
 	"github.com/gin-gonic/gin"
+	"github.com/hashicorp/consul/api"
 	"github.com/mcuadros/go-gin-prometheus"
 	"github.com/swaggo/files"
 	"github.com/swaggo/gin-swagger"
@@ -20,6 +22,9 @@ import (
 	"github.com/sak0/seeder/pkg/repoer"
 	"github.com/sak0/seeder/pkg/cluster"
 	"github.com/sak0/seeder/pkg/keeper"
+	"github.com/sak0/seeder/pkg/leader"
+	"os/signal"
+	"syscall"
 )
 
 const (
@@ -40,8 +45,9 @@ var (
 	master 			string
 	repoAddr		string
 	advAddr 		string
-
 	useNat 			bool
+
+	ConsulURI = os.Getenv("CONSUL_ADDR") + ":" + os.Getenv("CONSUL_PORT")
 )
 
 func init() {
@@ -61,6 +67,114 @@ func init() {
 	utils.SetNodeName(myName, role)
 }
 
+func run(stopCh chan struct{}) {
+	for {
+		glog.V(2).Infof("%s: I am leader.", utils.MyNodeName)
+		select {
+		case <-stopCh:
+			glog.V(2).Infof("%s: exit.", utils.MyNodeName)
+			return
+		default:
+			if err := utils.HarborAuth(); err != nil {
+				panic(err)
+			}
+
+			myIp, err := utils.GetMyIpAddr()
+			if err != nil {
+				panic(err)
+			}
+			if !useNat {
+				advAddr = myIp
+			}
+
+			if err := models.InitDB(dbAddr, dbName, dbUser, dbPassword, initDb); err != nil {
+				glog.Fatalf("init db failed: %v", err)
+				return
+			}
+
+			if err := utils.ServiceRegister(WhoIAm, PortIUse, baseURL + healthURL); err != nil {
+				glog.Fatalf("service register failed: %v", err)
+			}
+
+			done := make(chan interface{})
+			defer close(done)
+			go func() {
+				for {
+					select {
+					case <-done:
+						return
+					case <-time.After(1 * time.Minute):
+						utils.DoResourceMonitor()
+					}
+				}
+			}()
+
+			// ***run state machine***
+			// repoWatcher: watch local repo/charts
+			// clusterSyncer: aggregate all nodes info
+			// localKeeper: sync cluster info to local database
+			{
+				repoWatcher, err := repoer.NewRepoWatcher(myName, role, repoAddr, advAddr + ":" + strconv.Itoa(PortIUse), myIp, done)
+				if err != nil {
+					glog.Fatalf("watch repo %s failed: %v", repoAddr, err)
+					return
+				}
+				go repoWatcher.Run()
+
+				clusterSync := cluster.NewClusterSyncer(role, master, myName, repoAddr, "gossip", done)
+				go clusterSync.Run()
+				clusterSync.RegisterReporter(repoWatcher)
+
+				localKeeper := keeper.NewLocalKeeper(role, master, myName, done)
+				go localKeeper.Run()
+				localKeeper.RegisterReporter(clusterSync)
+			}
+
+			gin.SetMode(gin.ReleaseMode)
+			r := gin.New()
+
+			p := ginprometheus.NewPrometheus("gin")
+			p.Use(r)
+			r.Use(gin.Recovery())
+
+			r.Use(controller.RequestIdMiddleware())
+
+			url := ginSwagger.URL(fmt.Sprintf("http://%s:%d/swagger/doc.json", myIp, PortIUse)) // The url pointing to API definition
+			r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
+
+			v1 := r.Group(baseURL)
+			{
+				v1.GET(healthURL, controller.HealthCheck)
+				v1.GET("cluster", controller.GetCluster)
+
+				repository := v1.Group("/repository")
+				{
+					repository.GET("", controller.GetRepository)
+					repository.GET(":id/tags", controller.GetRepositoryTags)
+					repository.POST(":id/:tag/download", controller.UpdateRepositoryTag)
+					repository.DELETE(":id/:tag", controller.DeleteRepositoryTag)
+				}
+
+				chart := v1.Group("/chart")
+				{
+					chart.GET("", controller.GetChartRepo)
+					chart.GET(":id/versions", controller.GetChartVersion)
+					chart.DELETE(":id", controller.DeleteChart)
+					chart.POST(":id/:version/download", controller.DownloadChartVersion)
+					chart.DELETE(":id/:version", controller.DeleteChartVersion)
+					chart.POST(":id/:version/push", controller.PushChartVersion)
+				}
+
+				v1.GET("/versiondetail/params", controller.GetChartVersionParam)
+				v1.GET("/versiondetail/filelist", controller.GetChartVersionFileList)
+				v1.GET("/versiondetail/file", controller.GetChartVersionFileContent)
+			}
+
+			glog.Fatal(r.Run("0.0.0.0:" + strconv.Itoa(PortIUse)))
+		}
+	}
+}
+
 // @title Seeder API
 // @version 0.1
 // @description Server for image/chart repo consistent.
@@ -76,100 +190,25 @@ func init() {
 // @host 172.16.24.200:15000
 // @BasePath /
 func main() {
-	if err := utils.HarborAuth(); err != nil {
-		panic(err)
+	consulConfig := &api.Config{
+		Address: ConsulURI,
 	}
-
-	myIp, err := utils.GetMyIpAddr()
+	client, err := api.NewClient(consulConfig)
 	if err != nil {
 		panic(err)
 	}
-	if !useNat {
-		advAddr = myIp
+	stopC := make(chan struct{})
+
+	le := &leader.LeaderElection{
+		Client  	: client,
+		TTL			: 10 * time.Second,
+		CallBack 	: run,
+		StopCh		: stopC,
 	}
+	go le.Run()
 
-	if err := models.InitDB(dbAddr, dbName, dbUser, dbPassword, initDb); err != nil {
-		glog.Fatalf("init db failed: %v", err)
-		return
-	}
-
-	if err := utils.ServiceRegister(WhoIAm, PortIUse, baseURL + healthURL); err != nil {
-		glog.V(2).Infof("service register failed: %v", err)
-	}
-
-	done := make(chan interface{})
-	defer close(done)
-	go func() {
-		for {
-			select {
-			case <-done:
-				return
-			case <-time.After(1 * time.Minute):
-				utils.DoResourceMonitor()
-			}
-		}
-	}()
-
-	// ***run state machine***
-	// repoWatcher: watch local repo/charts
-	// clusterSyncer: aggregate all nodes info
-	// localKeeper: sync cluster info to local database
-	{
-		repoWatcher, err := repoer.NewRepoWatcher(myName, role, repoAddr, advAddr + ":" + strconv.Itoa(PortIUse), myIp, done)
-		if err != nil {
-			glog.Fatalf("watch repo %s failed: %v", repoAddr, err)
-			return
-		}
-		go repoWatcher.Run()
-
-		clusterSync := cluster.NewClusterSyncer(role, master, myName, repoAddr, "gossip", done)
-		go clusterSync.Run()
-		clusterSync.RegisterReporter(repoWatcher)
-
-		localKeeper := keeper.NewLocalKeeper(role, master, myName, done)
-		go localKeeper.Run()
-		localKeeper.RegisterReporter(clusterSync)
-	}
-
-	gin.SetMode(gin.ReleaseMode)
-	r := gin.New()
-
-	p := ginprometheus.NewPrometheus("gin")
-	p.Use(r)
-	r.Use(gin.Recovery())
-
-	r.Use(controller.RequestIdMiddleware())
-
-	url := ginSwagger.URL(fmt.Sprintf("http://%s:%d/swagger/doc.json", myIp, PortIUse)) // The url pointing to API definition
-	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
-
-	v1 := r.Group(baseURL)
-	{
-		v1.GET(healthURL, controller.HealthCheck)
-		v1.GET("cluster", controller.GetCluster)
-
-		repository := v1.Group("/repository")
-		{
-			repository.GET("", controller.GetRepository)
-			repository.GET(":id/tags", controller.GetRepositoryTags)
-			repository.POST(":id/:tag/download", controller.UpdateRepositoryTag)
-			repository.DELETE(":id/:tag", controller.DeleteRepositoryTag)
-		}
-
-		chart := v1.Group("/chart")
-		{
-			chart.GET("", controller.GetChartRepo)
-			chart.GET(":id/versions", controller.GetChartVersion)
-			chart.DELETE(":id", controller.DeleteChart)
-			chart.POST(":id/:version/download", controller.DownloadChartVersion)
-			chart.DELETE(":id/:version", controller.DeleteChartVersion)
-			chart.POST(":id/:version/push", controller.PushChartVersion)
-		}
-
-		v1.GET("/versiondetail/params", controller.GetChartVersionParam)
-		v1.GET("/versiondetail/filelist", controller.GetChartVersionFileList)
-		v1.GET("/versiondetail/file", controller.GetChartVersionFileContent)
-	}
-
-	glog.Fatal(r.Run("0.0.0.0:" + strconv.Itoa(PortIUse)))
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+	<-c
+	close(stopC)
 }

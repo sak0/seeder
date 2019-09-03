@@ -1,0 +1,79 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: seeder
+  labels:
+    app: seeder
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: seeder
+  template:
+    metadata:
+      labels:
+        app: seeder
+    spec:
+      tolerations:
+      - effect: NoSchedule
+        key: dedicated
+        operator: Equal
+        value: middleware
+      - effect: NoSchedule
+        key: cloudminds.com/schedule
+        operator: Exists
+      containers:
+      - name: seeder
+        image: 172.16.24.103/ycloud/seeder:0.1
+        imagePullPolicy: IfNotPresent
+        command: ["/seeder"]
+        args:
+        - "-v"
+        - "2"
+        - "-alsologtostderr"
+        - "--node-name"
+        - "edge-node-pc"
+        - "--master-addr"
+        - "172.16.24.200"
+        - "--role"
+        - "follower"
+        - "--repo-addr"
+        - "http://172.16.24.102"
+        - "--db-addr"
+        - "172.16.24.102:3306"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 15000
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        env:
+        - name: CONSUL_ADDR
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        - name: CONSUL_PORT
+          value: "8500"
+        - name: REDIS_HOST
+          value: "10.216.155.49:6379"
+        - name: REDIS_PASSWD
+          value: "yhcs"
+        - name: REDIS_MASTER_NAME
+          value: "mymaster"
+        - name: REDIS_MODE
+          value: "single"
+        - name: REDIS_DB
+          value: "0"
+        - name: HARBOR_USER
+          value: "admin"
+        - name: HARBOR_PASSWD
+          value: "Harbor12345"
+        resources:
+          requests:
+            cpu: 500m
+            memory: 512Mi
+        ports:
+        - containerPort: 15000
+
