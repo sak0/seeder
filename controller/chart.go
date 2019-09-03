@@ -23,6 +23,7 @@ import (
 // @Param pageSize query int false "PageSize"
 // @Param cached query bool false "Cached"
 // @Param chart_name query string false "chart_name"
+// @Param type query string false "type"
 // @Param ClusterName query string false "ClusterName"
 // @Success 200 {object} models.ChartRepo
 // @Failure 500 {string} string "Internal Error"
@@ -36,6 +37,7 @@ func GetChartRepo(c *gin.Context) {
 	page, _ := strconv.Atoi(c.Query("Page"))
 	pageSize, _ := strconv.Atoi(c.Query("PageSize"))
 	chartName := c.Query("chart_name")
+	typeName := c.Query("type")
 
 	var cached bool
 	var err error
@@ -52,9 +54,9 @@ func GetChartRepo(c *gin.Context) {
 	var count int
 	if clusterName == "" {
 		if setCached == "" {
-			charts, count, err = models.GetAllCharts(page, pageSize, chartName)
+			charts, count, err = models.GetAllCharts(page, pageSize, chartName, typeName)
 		} else {
-			charts, count, err = models.GetAllCachedCharts(page, pageSize, chartName, cached)
+			charts, count, err = models.GetAllCachedCharts(page, pageSize, chartName, typeName, cached)
 		}
 
 		if err != nil {
@@ -85,11 +87,11 @@ func GetChartRepo(c *gin.Context) {
 
 		var url string
 		if setCached == "" {
-			url = fmt.Sprintf("http://%s/api/v1/chart?page=%d&page_size=%d&chart_name=%s",
-				node.AdvertiseAddr, page, pageSize, chartName)
+			url = fmt.Sprintf("http://%s/api/v1/chart?page=%d&page_size=%d&chart_name=%s&type=%s",
+				node.AdvertiseAddr, page, pageSize, chartName, typeName)
 		} else {
-			url = fmt.Sprintf("http://%s/api/v1/chart?page=%d&page_size=%d&chart_name=%s&cached=%s",
-				node.AdvertiseAddr, page, pageSize, chartName, strconv.FormatBool(cached))
+			url = fmt.Sprintf("http://%s/api/v1/chart?page=%d&page_size=%d&chart_name=%s&type=%s&cached=%s",
+				node.AdvertiseAddr, page, pageSize, chartName, typeName, strconv.FormatBool(cached))
 		}
 		req, err := http.NewRequest(http.MethodGet, url, nil)
 		if err != nil {

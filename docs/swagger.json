@@ -53,6 +53,12 @@
                     },
                     {
                         "type": "string",
+                        "description": "type",
+                        "name": "type",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
                         "description": "ClusterName",
                         "name": "ClusterName",
                         "in": "query"

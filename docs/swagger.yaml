@@ -147,6 +147,10 @@ paths:
         in: query
         name: chart_name
         type: string
+      - description: type
+        in: query
+        name: type
+        type: string
       - description: ClusterName
         in: query
         name: ClusterName

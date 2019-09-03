@@ -2,13 +2,16 @@ package models
 
 import "github.com/golang/glog"
 
-func GetAllCharts(page, pageSize int, chartName string) ([]*ChartRepo, int, error) {
+func GetAllCharts(page, pageSize int, chartName, typeName string) ([]*ChartRepo, int, error) {
 	var count int
 	var charts []*ChartRepo
 	db := Db.Model(&ChartRepo{})
 
 	if chartName != "" {
 		db = db.Where("name = ?", chartName)
+	}
+	if typeName != "" {
+		db = db.Where("type = ?", typeName)
 	}
 
 	db = db.Count(&count)
@@ -24,13 +27,16 @@ func GetAllCharts(page, pageSize int, chartName string) ([]*ChartRepo, int, erro
 	return charts, count, nil
 }
 
-func GetAllCachedCharts(page, pageSize int, chartName string, cached bool) ([]*ChartRepo, int, error) {
+func GetAllCachedCharts(page, pageSize int, chartName, typeName string, cached bool) ([]*ChartRepo, int, error) {
 	var count int
 	var charts []*ChartRepo
 	db := Db.Model(&ChartRepo{})
 
 	if chartName != "" {
 		db = db.Where("name = ?", chartName)
+	}
+	if typeName != "" {
+		db = db.Where("type = ?", typeName)
 	}
 
 	db = db.Where("cached = ?", cached)

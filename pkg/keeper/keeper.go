@@ -265,7 +265,7 @@ func (k *LocalKeeper) getLocalNodes() ([]*models.SeederNode, error) {
 }
 
 func (k *LocalKeeper) getLocalUnCachedCharts() ([]*models.ChartRepo, error) {
-	charts, _, err := models.GetAllCachedCharts(0,0, "", false)
+	charts, _, err := models.GetAllCachedCharts(0,0, "", "", false)
 	if err != nil {
 		return nil, err
 	}
