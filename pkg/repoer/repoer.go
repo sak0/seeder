@@ -69,6 +69,7 @@ func (w *RepoWatcher) doLoop() {
 		Name : utils.DefaultProjectName,
 	}
 	projects, _, errs := w.client.Projects.ListProject(&proOpts)
+
 	if len(errs) > 0 {
 		glog.V(2).Infof("list repository failed: %v", errs)
 		return

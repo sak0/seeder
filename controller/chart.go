@@ -21,7 +21,6 @@ import (
 // @Produce json
 // @Param page query int false "Page"
 // @Param pageSize query int false "PageSize"
-// @Param status query bool false "VerifyStatus"
 // @Param cached query bool false "Cached"
 // @Param chart_name query string false "chart_name"
 // @Param ClusterName query string false "ClusterName"
@@ -38,8 +37,26 @@ func GetChartRepo(c *gin.Context) {
 	pageSize, _ := strconv.Atoi(c.Query("PageSize"))
 	chartName := c.Query("chart_name")
 
+	var cached bool
+	var err error
+	setCached := c.Query("cached")
+	if setCached != "" {
+		cached, err = strconv.ParseBool(setCached)
+		if err != nil {
+			RespErr(ERRBADREQUEST, ERROR_INVALID_PARAMS, "cached params invalid.", c)
+			return
+		}
+	}
+
+	var charts []*models.ChartRepo
+	var count int
 	if clusterName == "" {
-		charts, count, err := models.GetAllCharts(page, pageSize, chartName)
+		if setCached == "" {
+			charts, count, err = models.GetAllCharts(page, pageSize, chartName)
+		} else {
+			charts, count, err = models.GetAllCachedCharts(page, pageSize, chartName, cached)
+		}
+
 		if err != nil {
 			RespErr(ERRBADREQUEST, ERROR_INVALID_PARAMS, "get chart failed.", c)
 			return
@@ -67,11 +84,12 @@ func GetChartRepo(c *gin.Context) {
 		}
 
 		var url string
-		if pageSize > 0 && page > 0 {
+		if setCached == "" {
 			url = fmt.Sprintf("http://%s/api/v1/chart?page=%d&page_size=%d&chart_name=%s",
 				node.AdvertiseAddr, page, pageSize, chartName)
 		} else {
-			url = fmt.Sprintf("http://%s/api/v1/chart?chart_name=%s", node.AdvertiseAddr, chartName)
+			url = fmt.Sprintf("http://%s/api/v1/chart?page=%d&page_size=%d&chart_name=%s&cached=%s",
+				node.AdvertiseAddr, page, pageSize, chartName, strconv.FormatBool(cached))
 		}
 		req, err := http.NewRequest(http.MethodGet, url, nil)
 		if err != nil {
@@ -129,7 +147,6 @@ func GetChartVersion(c *gin.Context) {
 
 	page, _ := strconv.Atoi(c.Query("Page"))
 	pageSize, _ := strconv.Atoi(c.Query("PageSize"))
-
 
 	if clusterName == "" {
 		versions, count, err := models.GetVersionByChart(page, pageSize, chartName)

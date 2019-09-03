@@ -41,12 +41,6 @@
                     },
                     {
                         "type": "boolean",
-                        "description": "VerifyStatus",
-                        "name": "status",
-                        "in": "query"
-                    },
-                    {
-                        "type": "boolean",
                         "description": "Cached",
                         "name": "cached",
                         "in": "query"
@@ -609,6 +603,9 @@
                     "type": "boolean"
                 },
                 "created": {
+                    "type": "string"
+                },
+                "description": {
                     "type": "string"
                 },
                 "home": {

@@ -34,7 +34,7 @@ func GetUnCachedVersions(page, pageSize int, cacheStatus bool) ([]*ChartVersion,
 	db = db.Order("created desc")
 
 	db = db.Find(&versions)
-	glog.V(5).Infof("db query version count %d with cache %b", count, cacheStatus)
+	glog.V(5).Infof("db query version count %d with cache %v", count, cacheStatus)
 
 	return versions, count, nil
 }

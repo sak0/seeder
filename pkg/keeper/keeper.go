@@ -20,6 +20,13 @@ const (
 	verifyStatusUnknown	= "unknown"
 )
 
+func judgementVerifyStatus() string {
+	if utils.MyRole == "master" {
+		return verifyStatusTrue
+	}
+	return verifyStatusFalse
+}
+
 func formatNode(keepInfo repoer.ReporterInfo) (*models.SeederNode, error) {
 	if keepInfo.NodeInfo == nil {
 		return nil, fmt.Errorf("invalid report info: %s", keepInfo.NodeName)
@@ -59,7 +66,7 @@ func formatVersions(keepInfo repoer.ReporterInfo, cached bool, verifyStatus stri
 	return versions
 }
 
-func formatCharts(keepInfo repoer.ReporterInfo) []*models.ChartRepo {
+func formatCharts(keepInfo repoer.ReporterInfo, cached bool, verifyStatus string) []*models.ChartRepo {
 	var charts []*models.ChartRepo
 	for _, chartRepo := range keepInfo.Charts {
 		chart := &models.ChartRepo{
@@ -69,8 +76,8 @@ func formatCharts(keepInfo repoer.ReporterInfo) []*models.ChartRepo {
 			LatestVersion:chartRepo.LatestVersion,
 			Icon:chartRepo.Icon,
 			Home:chartRepo.Home,
-			VerifyStatus:verifyStatusTrue,
-			Cached:true,
+			VerifyStatus:verifyStatus,
+			Cached:cached,
 			CreationTime:chartRepo.CreationTime,
 			UpdateTime:chartRepo.UpdateTime,
 		}
@@ -389,8 +396,13 @@ func (k *LocalKeeper) syncTags(keepInfo repoer.ReporterInfo) {
 	}
 }
 
-func (k *LocalKeeper) syncCharts(keepInfo repoer.ReporterInfo) {
-	remoteCharts := formatCharts(keepInfo)
+func (k *LocalKeeper) syncCharts(keepInfo, masterInfo repoer.ReporterInfo) {
+	k.syncLocalCharts(keepInfo)
+	k.syncMasterCharts(masterInfo)
+}
+
+func (k *LocalKeeper) syncLocalCharts(keepInfo repoer.ReporterInfo) {
+	remoteCharts := formatCharts(keepInfo, true, judgementVerifyStatus())
 	localCharts, err := k.getLocalCharts()
 	if err != nil {
 		glog.V(2).Infof("get local charts failed: %v", err)
@@ -402,6 +414,10 @@ func (k *LocalKeeper) syncCharts(keepInfo repoer.ReporterInfo) {
 	for _, chartAdd := range chartsAdd {
 		k.addChart(chartAdd)
 	}
+}
+
+func (k *LocalKeeper) syncMasterCharts(masterInfo repoer.ReporterInfo) {
+
 }
 
 func (k *LocalKeeper) syncVersions(keepInfo, masterInfo repoer.ReporterInfo) {
@@ -426,13 +442,7 @@ func (k *LocalKeeper) syncMasterVersions(masterInfo repoer.ReporterInfo) {
 }
 
 func (k *LocalKeeper) syncLocalVersions(keepInfo repoer.ReporterInfo) {
-	var verifyStatus string
-	if utils.MyRole == "master" {
-		verifyStatus = verifyStatusTrue
-	} else {
-		verifyStatus = verifyStatusFalse
-	}
-	remoteVersions := formatVersions(keepInfo, true, verifyStatus)
+	remoteVersions := formatVersions(keepInfo, true, judgementVerifyStatus())
 	localVersions, err := k.getLocalVersions()
 	if err != nil {
 		glog.V(2).Infof("get local charts failed: %v", err)
@@ -451,8 +461,8 @@ func (k *LocalKeeper) syncLocalVersions(keepInfo repoer.ReporterInfo) {
 			glog.V(2).Infof("get local unCached versions failed: %v", err)
 			return
 		}
-		glog.V(2).Infof("[remoteVersions] %v", remoteVersions)
-		glog.V(2).Infof("[localUnCachedVersions] %v", localUnCachedVersions)
+		glog.V(5).Infof("[remoteVersions] %v", remoteVersions)
+		glog.V(5).Infof("[localUnCachedVersions] %v", localUnCachedVersions)
 		for _, localUnCachedVersion := range localUnCachedVersions {
 			for _, remoteVersion := range remoteVersions {
 				if localUnCachedVersion.Version == remoteVersion.Version &&
@@ -494,7 +504,7 @@ func (k *LocalKeeper) doSync() {
 	{
 		k.syncRepos(keepInfo)
 		k.syncTags(keepInfo)
-		k.syncCharts(keepInfo)
+		k.syncCharts(keepInfo, masterInfo)
 		k.syncVersions(keepInfo, masterInfo)
 	}
 }
