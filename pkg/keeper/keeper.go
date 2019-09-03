@@ -290,7 +290,7 @@ func (k *LocalKeeper) getLocalVersions() ([]*models.ChartVersion, error) {
 }
 
 func (k *LocalKeeper) getLocalCharts() ([]*models.ChartRepo, error) {
-	charts, _, err := models.GetAllCharts(0, 0, "")
+	charts, _, err := models.GetAllCharts(0, 0, "", "")
 	if err != nil {
 		return nil, err
 	}
