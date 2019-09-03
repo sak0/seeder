@@ -4,6 +4,7 @@
 ![seeder](./docs/doc/arch.png)
 
 # Usage
+```
 Usage of ./seeder:
     -advertise-addr string
         addr for advertise. (default "10.12.103.89")
@@ -41,3 +42,13 @@ Usage of ./seeder:
         log level for V logs
     -vmodule value
         comma-separated list of pattern=N settings for file-filtered logging
+```		
+
+# How to build
+```
+git clone git@github.com:sak0/seeder.git
+
+cd seeder
+
+docker build .
+```		
