@@ -374,8 +374,8 @@ func (k *LocalKeeper) syncNode(keepInfo repoer.ReporterInfo) {
 		glog.V(2).Infof("get local nodes failed: %v", err)
 		return
 	}
-	glog.V(5).Infof("[remoteNode] %v", remoteNode)
-	glog.V(5).Infof("[localNodes] %v", localNodes)
+	glog.V(5).Infof("[stateSyncNode] %v", remoteNode)
+	glog.V(5).Infof("[dbNodes] %v", localNodes)
 	nodeAdds, _, _ := diffNodes(remoteNode, localNodes)
 	for _, nodeAdd := range nodeAdds {
 		k.addNode(nodeAdd)
@@ -389,8 +389,8 @@ func (k *LocalKeeper) syncRepos(keepInfo repoer.ReporterInfo) {
 		glog.V(2).Infof("get local repo failed: %v", err)
 		return
 	}
-	glog.V(5).Infof("[remoteRepos] %v", remoteRepos)
-	glog.V(5).Infof("[localRepos] %v", localRepos)
+	glog.V(5).Infof("[stateSyncRepos] %v", remoteRepos)
+	glog.V(5).Infof("[dbRepos] %v", localRepos)
 	reposAdd, _, _ := diffRepos(remoteRepos, localRepos)
 	for _, repoAdd := range reposAdd {
 		k.addRepo(repoAdd)
@@ -404,8 +404,8 @@ func (k *LocalKeeper) syncTags(keepInfo repoer.ReporterInfo) {
 		glog.V(2).Infof("get local tags failed: %v", err)
 		return
 	}
-	glog.V(5).Infof("[remoteTags] %v", remoteTags)
-	glog.V(5).Infof("[localTags] %v", localTags)
+	glog.V(5).Infof("[stateSyncTags] %v", remoteTags)
+	glog.V(5).Infof("[dbTags] %v", localTags)
 	tagsAdd, _, _ := diffTags(remoteTags, localTags)
 	for _, tagAdd := range tagsAdd {
 		k.addTag(tagAdd)
@@ -424,8 +424,8 @@ func (k *LocalKeeper) syncLocalCharts(keepInfo repoer.ReporterInfo) {
 		glog.V(2).Infof("get local charts failed: %v", err)
 		return
 	}
-	glog.V(5).Infof("[remoteCharts] %v", remoteCharts)
-	glog.V(5).Infof("[localCharts] %v", localCharts)
+	glog.V(5).Infof("[stateSyncCharts] %v", remoteCharts)
+	glog.V(5).Infof("[dbCharts] %v", localCharts)
 	chartsAdd, _, _ := diffCharts(remoteCharts, localCharts)
 	for _, chartAdd := range chartsAdd {
 		k.addChart(chartAdd)
@@ -437,8 +437,8 @@ func (k *LocalKeeper) syncLocalCharts(keepInfo repoer.ReporterInfo) {
 			glog.V(2).Infof("get local unCached versions failed: %v", err)
 			return
 		}
-		glog.V(2).Infof("[remoteCharts] %v", remoteCharts)
-		glog.V(2).Infof("[localUnCachedCharts] %v", localUnCachedCharts)
+		glog.V(2).Infof("[stateSyncCharts] %v", remoteCharts)
+		glog.V(2).Infof("[dbUnCachedCharts] %v", localUnCachedCharts)
 		for _, localUnCachedChart := range localUnCachedCharts {
 			for _, remoteChart := range remoteCharts {
 				if localUnCachedChart.Name == remoteChart.Name {
@@ -458,7 +458,7 @@ func (k *LocalKeeper) syncMasterCharts(masterInfo repoer.ReporterInfo) {
 	}
 
 	glog.V(2).Infof("[masterCharts] %v", masterCharts)
-	glog.V(2).Infof("[localCharts] %v", localCharts)
+	glog.V(2).Infof("[dbCharts] %v", localCharts)
 	chartsAdd, _, _ := diffCharts(masterCharts, localCharts)
 	for _, chartAdd := range chartsAdd {
 		k.addChart(chartAdd)
@@ -479,7 +479,7 @@ func (k *LocalKeeper) syncMasterVersions(masterInfo repoer.ReporterInfo) {
 	}
 
 	glog.V(5).Infof("[masterVersions] %v", masterVersions)
-	glog.V(5).Infof("[localVersions] %v", localVersions)
+	glog.V(5).Infof("[dbVersions] %v", localVersions)
 	versionsAdd, _, _ := diffVersions(masterVersions, localVersions)
 	for _, versionAdd := range versionsAdd {
 		k.addVersion(versionAdd)
@@ -493,8 +493,8 @@ func (k *LocalKeeper) syncLocalVersions(keepInfo repoer.ReporterInfo) {
 		glog.V(2).Infof("get local charts failed: %v", err)
 		return
 	}
-	glog.V(5).Infof("[remoteVersions] %v", remoteVersions)
-	glog.V(5).Infof("[localVersions] %v", localVersions)
+	glog.V(5).Infof("[stateSyncVersions] %v", remoteVersions)
+	glog.V(5).Infof("[dbVersions] %v", localVersions)
 	versionsAdd, _, _ := diffVersions(remoteVersions, localVersions)
 	for _, versionAdd := range versionsAdd {
 		k.addVersion(versionAdd)
@@ -506,8 +506,8 @@ func (k *LocalKeeper) syncLocalVersions(keepInfo repoer.ReporterInfo) {
 			glog.V(2).Infof("get local unCached versions failed: %v", err)
 			return
 		}
-		glog.V(5).Infof("[remoteVersions] %v", remoteVersions)
-		glog.V(5).Infof("[localUnCachedVersions] %v", localUnCachedVersions)
+		glog.V(5).Infof("[stateSyncVersions] %v", remoteVersions)
+		glog.V(5).Infof("[dbUnCachedVersions] %v", localUnCachedVersions)
 		for _, localUnCachedVersion := range localUnCachedVersions {
 			for _, remoteVersion := range remoteVersions {
 				if localUnCachedVersion.Version == remoteVersion.Version &&
