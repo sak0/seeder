@@ -57,3 +57,10 @@ func CreateChart(chart *ChartRepo) error {
 	}
 	return nil
 }
+
+func UpdateChartCached(chartName string) error {
+	db := Db.Model(&ChartRepo{})
+	db = db.Where("name = ?", chartName)
+	db.Update("cached", true)
+	return nil
+}

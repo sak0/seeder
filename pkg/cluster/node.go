@@ -165,7 +165,7 @@ func (n *SeederNode) doLoop() {
 			glog.V(2).Infof("can not marshal node %s meta", member.Name)
 			continue
 		}
-		glog.V(2).Infof("[%s-%s] %v", member.Name, member.Addr, meta)
+		glog.V(5).Infof("node meta: [%s-%s] %v", member.Name, member.Addr, meta)
 	}
 
 	received := n.watcher.Report()
