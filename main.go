@@ -4,6 +4,8 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"os/signal"
+	"syscall"
 	"strconv"
 	"time"
 
@@ -23,8 +25,6 @@ import (
 	"github.com/sak0/seeder/pkg/cluster"
 	"github.com/sak0/seeder/pkg/keeper"
 	"github.com/sak0/seeder/pkg/leader"
-	"os/signal"
-	"syscall"
 )
 
 const (
