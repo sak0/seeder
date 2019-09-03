@@ -70,3 +70,22 @@ func UpdateChartCached(chartName string) error {
 	db.Update("cached", true)
 	return nil
 }
+
+func DeleteChartByName(chartName string) error {
+	var count int
+	var charts []*ChartRepo
+	glog.V(5).Infof("delete chart item: %s", chartName)
+
+	db := Db.Model(&ChartRepo{})
+	db = db.Where("name = ?", chartName)
+
+	db = db.Count(&count)
+	if count > 1 {
+		glog.Warningf("there have %d charts with name %s", count, chartName)
+	}
+	db = db.Find(&charts)
+
+	db.Delete(&charts)
+
+	return nil
+}

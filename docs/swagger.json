@@ -80,6 +80,39 @@
                 }
             }
         },
+        "/api/v1/chart/{chartName}": {
+            "delete": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "删除本地指定Chart",
+                "parameters": [
+                    {
+                        "type": "boolean",
+                        "description": "only delete from db.",
+                        "name": "soft_delete",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "202": {
+                        "description": "Accepted",
+                        "schema": {
+                            "$ref": "#/definitions/models.ChartVersion"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/chart/{chartName}/versions": {
             "get": {
                 "consumes": [
@@ -137,7 +170,7 @@
                 }
             }
         },
-        "/api/v1/chart/{repo}/{version}": {
+        "/api/v1/chart/{chartName}/{version}": {
             "delete": {
                 "consumes": [
                     "application/json"
@@ -146,6 +179,14 @@
                     "application/json"
                 ],
                 "summary": "删除本地指定Chart仓库的指定版本",
+                "parameters": [
+                    {
+                        "type": "boolean",
+                        "description": "only delete from db.",
+                        "name": "soft_delete",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "202": {
                         "description": "Accepted",
@@ -162,7 +203,7 @@
                 }
             }
         },
-        "/api/v1/chart/{repo}/{version}/download": {
+        "/api/v1/chart/{chartName}/{version}/download": {
             "post": {
                 "consumes": [
                     "application/json"
@@ -199,7 +240,7 @@
                 }
             }
         },
-        "/api/v1/chart/{repo}/{version}/push": {
+        "/api/v1/chart/{chartName}/{version}/push": {
             "post": {
                 "consumes": [
                     "application/json"

@@ -492,7 +492,7 @@ func GetChartVersionParam(c *gin.Context) {
 // @Param version body models.ChartVersion true "Download the version to local"
 // @Success 202 {object} models.ChartVersion
 // @Failure 500 {string} string "Internal Error"
-// @Router /api/v1/chart/{repo}/{version}/download [post]
+// @Router /api/v1/chart/{chartName}/{version}/download [post]
 func DownloadChartVersion(c *gin.Context) {
 	resp := Response{}
 	c.JSON(http.StatusOK, resp)
@@ -505,7 +505,7 @@ func DownloadChartVersion(c *gin.Context) {
 // @Param remote query string true "remote"
 // @Success 202 {object} models.ChartVersion
 // @Failure 500 {string} string "Internal Error"
-// @Router /api/v1/chart/{repo}/{version}/push [post]
+// @Router /api/v1/chart/{chartName}/{version}/push [post]
 func PushChartVersion(c *gin.Context) {
 	resp := Response{}
 	chartName := c.Param("id")
@@ -549,12 +549,57 @@ func PushChartVersion(c *gin.Context) {
 	c.JSON(http.StatusOK, resp)
 }
 
+// @Summary 删除本地指定Chart
+// @Accept  json
+// @Produce json
+// @Param soft_delete query bool false "only delete from db."
+// @Success 202 {object} models.ChartVersion
+// @Failure 500 {string} string "Internal Error"
+// @Router /api/v1/chart/{chartName} [delete]
+func DeleteChart(c *gin.Context) {
+	resp := Response{}
+	chartName := c.Param("id")
+	if chartName == ""{
+		RespErr(ERRBADREQUEST, ERROR_INVALID_PARAMS, "must have chartName.", c)
+		return
+	}
+	isSoftDelete := c.Query("soft_delete")
+
+	err := models.DeleteChartByName(chartName)
+	if err != nil {
+		RespErr(ERRINTERNALERR, ERROR_INVALID_PARAMS, err.Error(), c)
+		return
+	}
+
+	resp.Message = fmt.Sprintf("delete chart %s success.", chartName)
+	resp.Code = "200"
+	if isSoftDelete != "true" {
+		nodeInfo, err := models.GetNodeByName(utils.GetMyNodeName())
+		if err != nil {
+			RespErr(ERRINTERNALERR, ERROR_INVALID_PARAMS,
+				fmt.Sprintf("can not get registry information for node %s", utils.GetMyNodeName()), c)
+			return
+		}
+		harborCli := harbor.NewClient(nil, nodeInfo.RepoAddr, utils.HarborUser, utils.HarborPass)
+		_, errs := harborCli.ChartRepos.DeleteChart(utils.DefaultProjectName, chartName)
+		if len(errs) > 0 {
+			RespErr(ERRINTERNALERR, ERROR_INVALID_PARAMS,
+				fmt.Sprintf("can not delete chart %s: %v", chartName, errs[0]), c)
+			return
+		}
+		c.JSON(http.StatusOK, resp)
+	}
+
+	c.JSON(http.StatusOK, resp)
+}
+
 // @Summary 删除本地指定Chart仓库的指定版本
 // @Accept  json
 // @Produce json
+// @Param soft_delete query bool false "only delete from db."
 // @Success 202 {object} models.ChartVersion
 // @Failure 500 {string} string "Internal Error"
-// @Router /api/v1/chart/{repo}/{version} [delete]
+// @Router /api/v1/chart/{chartName}/{version} [delete]
 func DeleteChartVersion(c *gin.Context) {
 	resp := Response{}
 	c.JSON(http.StatusOK, resp)

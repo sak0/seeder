@@ -167,6 +167,94 @@ paths:
           schema:
             type: string
       summary: 获取Chart仓库列表
+  /api/v1/chart/{chartName}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: only delete from db.
+        in: query
+        name: soft_delete
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "202":
+          description: Accepted
+          schema:
+            $ref: '#/definitions/models.ChartVersion'
+        "500":
+          description: Internal Error
+          schema:
+            type: string
+      summary: 删除本地指定Chart
+  /api/v1/chart/{chartName}/{version}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: only delete from db.
+        in: query
+        name: soft_delete
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "202":
+          description: Accepted
+          schema:
+            $ref: '#/definitions/models.ChartVersion'
+        "500":
+          description: Internal Error
+          schema:
+            type: string
+      summary: 删除本地指定Chart仓库的指定版本
+  /api/v1/chart/{chartName}/{version}/download:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Download the version to local
+        in: body
+        name: version
+        required: true
+        schema:
+          $ref: '#/definitions/models.ChartVersion'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "202":
+          description: Accepted
+          schema:
+            $ref: '#/definitions/models.ChartVersion'
+        "500":
+          description: Internal Error
+          schema:
+            type: string
+      summary: 下载更新指定Chart仓库的指定版本到本地仓库
+  /api/v1/chart/{chartName}/{version}/push:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: remote
+        in: query
+        name: remote
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "202":
+          description: Accepted
+          schema:
+            $ref: '#/definitions/models.ChartVersion'
+        "500":
+          description: Internal Error
+          schema:
+            type: string
+      summary: 推送指定Chart仓库的指定版本到远端仓库
   /api/v1/chart/{chartName}/versions:
     get:
       consumes:
@@ -204,68 +292,6 @@ paths:
           schema:
             type: string
       summary: 获取指定Chart仓库的版本列表
-  /api/v1/chart/{repo}/{version}:
-    delete:
-      consumes:
-      - application/json
-      produces:
-      - application/json
-      responses:
-        "202":
-          description: Accepted
-          schema:
-            $ref: '#/definitions/models.ChartVersion'
-        "500":
-          description: Internal Error
-          schema:
-            type: string
-      summary: 删除本地指定Chart仓库的指定版本
-  /api/v1/chart/{repo}/{version}/download:
-    post:
-      consumes:
-      - application/json
-      parameters:
-      - description: Download the version to local
-        in: body
-        name: version
-        required: true
-        schema:
-          $ref: '#/definitions/models.ChartVersion'
-          type: object
-      produces:
-      - application/json
-      responses:
-        "202":
-          description: Accepted
-          schema:
-            $ref: '#/definitions/models.ChartVersion'
-        "500":
-          description: Internal Error
-          schema:
-            type: string
-      summary: 下载更新指定Chart仓库的指定版本到本地仓库
-  /api/v1/chart/{repo}/{version}/push:
-    post:
-      consumes:
-      - application/json
-      parameters:
-      - description: remote
-        in: query
-        name: remote
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "202":
-          description: Accepted
-          schema:
-            $ref: '#/definitions/models.ChartVersion'
-        "500":
-          description: Internal Error
-          schema:
-            type: string
-      summary: 推送指定Chart仓库的指定版本到远端仓库
   /api/v1/cluster:
     get:
       consumes:
