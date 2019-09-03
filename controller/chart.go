@@ -185,7 +185,7 @@ func GetChartVersion(c *gin.Context) {
 			RespErr(ERRINTERNALERR, ERROR_INVALID_PARAMS, err.Error(), c)
 			return
 		}
-		remoteRawResp.Body.Close()
+		defer remoteRawResp.Body.Close()
 
 		err = json.Unmarshal(data, &remoteResp)
 		if err != nil {
@@ -368,7 +368,7 @@ func GetChartVersionFileContent(c *gin.Context) {
 			RespErr(ERRINTERNALERR, ERROR_INVALID_PARAMS, err.Error(), c)
 			return
 		}
-		remoteRawResp.Body.Close()
+		defer remoteRawResp.Body.Close()
 
 		err = json.Unmarshal(data, &remoteResp)
 		if err != nil {
@@ -455,7 +455,7 @@ func GetChartVersionParam(c *gin.Context) {
 			RespErr(ERRINTERNALERR, ERROR_INVALID_PARAMS, err.Error(), c)
 			return
 		}
-		remoteRawResp.Body.Close()
+		defer remoteRawResp.Body.Close()
 
 		err = json.Unmarshal(data, &remoteResp)
 		if err != nil {

@@ -66,6 +66,7 @@ type ChartRepo struct {
 	Name 			string		`json:"name" gorm:"type:varchar(50);column:name"`
 	VersionCount 	int64		`json:"version_count" gorm:"type:int;column:size"`
 	LatestVersion 	string		`json:"latest_version" gorm:"type:varchar(50);column:latest_version"`
+	Description		string		`json:"description" gorm:"type:varchar(255);column:description"`
 	Icon 			string		`json:"icon" gorm:"type:varchar(50);column:icon"`
 	Home 			string		`json:"home" gorm:"type:varchar(50);column:home"`
 	VerifyStatus 	string		`json:"verify_status" gorm:"type:varchar(50);column:verify_status"`

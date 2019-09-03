@@ -19,7 +19,7 @@ const (
 	HealthCheckTimeout	= "10s"
 	HealthCheckInterval	= "15s"
 
-	DefaultProjectName 		= "edge-cloud"
+	DefaultProjectName 	= "edge-cloud"
 )
 
 var (

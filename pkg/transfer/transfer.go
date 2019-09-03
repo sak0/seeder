@@ -151,6 +151,7 @@ func (t *Transfer) uploadChart(name, version string, chart io.Reader) error {
 	if err != nil {
 		return err
 	}
+	defer resp.Body.Close()
 
 	if resp.StatusCode < 200 || resp.StatusCode > 299 {
 		return &common_http.Error{
