@@ -437,8 +437,8 @@ func (k *LocalKeeper) syncLocalCharts(keepInfo repoer.ReporterInfo) {
 			glog.V(2).Infof("get local unCached versions failed: %v", err)
 			return
 		}
-		glog.V(2).Infof("[stateSyncCharts] %v", remoteCharts)
-		glog.V(2).Infof("[dbUnCachedCharts] %v", localUnCachedCharts)
+		glog.V(5).Infof("[stateSyncCharts] %v", remoteCharts)
+		glog.V(5).Infof("[dbUnCachedCharts] %v", localUnCachedCharts)
 		for _, localUnCachedChart := range localUnCachedCharts {
 			for _, remoteChart := range remoteCharts {
 				if localUnCachedChart.Name == remoteChart.Name {
@@ -457,8 +457,8 @@ func (k *LocalKeeper) syncMasterCharts(masterInfo repoer.ReporterInfo) {
 		return
 	}
 
-	glog.V(2).Infof("[masterCharts] %v", masterCharts)
-	glog.V(2).Infof("[dbCharts] %v", localCharts)
+	glog.V(5).Infof("[masterCharts] %v", masterCharts)
+	glog.V(5).Infof("[dbCharts] %v", localCharts)
 	chartsAdd, _, _ := diffCharts(masterCharts, localCharts)
 	for _, chartAdd := range chartsAdd {
 		k.addChart(chartAdd)
