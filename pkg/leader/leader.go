@@ -28,7 +28,7 @@ type LeaderElection struct {
 func GetMyIPAddr() string {
 	ips, err := net.IntranetIP()
 	if err != nil {
-		glog.V(2).Infof("can't get ip list!", err.Error())
+		glog.V(2).Infof("can't get ip list: %v", err.Error())
 		return ""
 	}
 	return ips[0]

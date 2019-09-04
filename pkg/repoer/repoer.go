@@ -45,7 +45,7 @@ type RepoWatcher struct {
 func (w *RepoWatcher) Report() []byte {
 	bytes, err := json.Marshal(w.info)
 	if err != nil {
-		glog.V(2).Infof("marshal report info failed: %v")
+		glog.V(2).Infof("marshal report info failed: %v", err)
 		return nil
 	}
 	return bytes

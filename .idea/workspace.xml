@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="ab5c3a85-161a-41e7-be8a-3830a17bdf17" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/leader/leader.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/leader/leader.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/repoer/repoer.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/repoer/repoer.go" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -38,15 +39,15 @@
         <counts>
           <entry key="Dockerfile" value="1" />
           <entry key="Makefile" value="1" />
-          <entry key="go" value="204" />
-          <entry key="md" value="1" />
+          <entry key="go" value="209" />
+          <entry key="md" value="2" />
           <entry key="yaml" value="1" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
-          <entry key="Go" value="204" />
-          <entry key="PLAIN_TEXT" value="3" />
+          <entry key="Go" value="209" />
+          <entry key="PLAIN_TEXT" value="4" />
           <entry key="YAML" value="1" />
         </counts>
       </usages-collector>
@@ -54,14 +55,14 @@
         <counts>
           <entry key="Dockerfile" value="11" />
           <entry key="Makefile" value="12" />
-          <entry key="go" value="27505" />
+          <entry key="go" value="27514" />
           <entry key="md" value="55" />
           <entry key="yaml" value="209" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="Go" value="27505" />
+          <entry key="Go" value="27514" />
           <entry key="PLAIN_TEXT" value="78" />
           <entry key="YAML" value="209" />
         </counts>
@@ -75,11 +76,56 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/README.md">
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/main.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="15">
-              <caret line="1" lean-forward="true" selection-start-line="1" selection-end-line="1" />
+            <state relative-caret-position="198">
+              <caret line="167" column="49" selection-start-line="167" selection-start-column="49" selection-end-line="167" selection-end-column="49" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/models/repos.go">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="260">
+              <caret line="23" column="27" lean-forward="true" selection-end-line="27" selection-end-column="1" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/controller/base.go">
+          <provider selected="true" editor-type-id="text-editor">
+            <state>
+              <caret column="18" lean-forward="true" selection-start-column="18" selection-end-column="18" />
+              <folding>
+                <element signature="e#20#136#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/pkg/repoer/repoer.go">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="270">
+              <caret line="60" column="22" lean-forward="true" selection-start-line="60" selection-start-column="22" selection-end-line="60" selection-end-column="22" />
+              <folding>
+                <element signature="e#16#143#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/pkg/leader/leader.go">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="269">
+              <caret line="34" column="1" lean-forward="true" selection-start-line="34" selection-start-column="1" selection-end-line="34" selection-end-column="1" />
+              <folding>
+                <element signature="e#16#183#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -99,6 +145,7 @@
       <find>Response</find>
       <find>getLocalUnCachedVersions</find>
       <find>logs</find>
+      <find>15000</find>
     </findStrings>
   </component>
   <component name="GOROOT" path="C:\Go" />
@@ -130,17 +177,17 @@
         <option value="$PROJECT_DIR$/models/models.go" />
         <option value="$PROJECT_DIR$/models/version.go" />
         <option value="$PROJECT_DIR$/../go-harbor/project.go" />
-        <option value="$PROJECT_DIR$/pkg/repoer/repoer.go" />
         <option value="$PROJECT_DIR$/pkg/cluster/node.go" />
         <option value="$PROJECT_DIR$/models/charts.go" />
         <option value="$PROJECT_DIR$/controller/chart.go" />
-        <option value="$PROJECT_DIR$/pkg/leader/leader.go" />
         <option value="$PROJECT_DIR$/Makefile" />
         <option value="$PROJECT_DIR$/Dockerfile" />
         <option value="$PROJECT_DIR$/deploy/deploy.yaml" />
         <option value="$PROJECT_DIR$/main.go" />
         <option value="$PROJECT_DIR$/pkg/keeper/keeper.go" />
         <option value="$PROJECT_DIR$/README.md" />
+        <option value="$PROJECT_DIR$/pkg/repoer/repoer.go" />
+        <option value="$PROJECT_DIR$/pkg/leader/leader.go" />
       </list>
     </option>
   </component>
@@ -166,6 +213,32 @@
             <path>
               <item name="seeder" type="b2602c69:ProjectViewProjectNode" />
               <item name="seeder" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="seeder" type="b2602c69:ProjectViewProjectNode" />
+              <item name="seeder" type="462c0819:PsiDirectoryNode" />
+              <item name="controller" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="seeder" type="b2602c69:ProjectViewProjectNode" />
+              <item name="seeder" type="462c0819:PsiDirectoryNode" />
+              <item name="deploy" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="seeder" type="b2602c69:ProjectViewProjectNode" />
+              <item name="seeder" type="462c0819:PsiDirectoryNode" />
+              <item name="models" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="seeder" type="b2602c69:ProjectViewProjectNode" />
+              <item name="seeder" type="462c0819:PsiDirectoryNode" />
+              <item name="pkg" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="seeder" type="b2602c69:ProjectViewProjectNode" />
+              <item name="seeder" type="462c0819:PsiDirectoryNode" />
+              <item name="pkg" type="462c0819:PsiDirectoryNode" />
+              <item name="leader" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -226,7 +299,7 @@
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" visible="true" weight="0.30940172" />
+      <window_info anchor="bottom" id="Run" order="2" visible="true" weight="0.21367522" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -347,13 +420,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/models/repos.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="345">
-          <caret line="23" column="27" lean-forward="true" selection-end-line="27" selection-end-column="1" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/../../satori/go.uuid/uuid.go">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1705">
@@ -452,16 +518,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/pkg/repoer/repoer.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="225">
-          <caret line="87" column="34" lean-forward="true" selection-start-line="87" selection-start-column="34" selection-end-line="87" selection-end-column="34" />
-          <folding>
-            <element signature="e#16#143#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/../go-harbor/vendor/github.com/parnurzeal/gorequest/gorequest.go">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-1020">
@@ -535,16 +591,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/pkg/leader/leader.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="56">
-          <caret line="91" lean-forward="true" selection-start-line="91" selection-end-line="91" />
-          <folding>
-            <element signature="e#16#183#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Dockerfile">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="165">
@@ -583,30 +629,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/controller/base.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret column="18" lean-forward="true" selection-start-column="18" selection-end-column="18" />
-          <folding>
-            <element signature="e#20#136#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/pkg/keeper/keeper.go">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2232">
           <caret line="372" column="19" lean-forward="true" selection-start-line="372" selection-start-column="19" selection-end-line="372" selection-end-column="19" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/main.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1341">
-          <caret line="106" column="49" lean-forward="true" selection-start-line="106" selection-start-column="49" selection-end-line="106" selection-end-column="49" />
-          <folding>
-            <element signature="e#14#502#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -624,10 +650,54 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/controller/base.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="18" lean-forward="true" selection-start-column="18" selection-end-column="18" />
+          <folding>
+            <element signature="e#20#136#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/README.md">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="15">
           <caret line="1" lean-forward="true" selection-start-line="1" selection-end-line="1" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/main.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="198">
+          <caret line="167" column="49" selection-start-line="167" selection-start-column="49" selection-end-line="167" selection-end-column="49" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/models/repos.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="260">
+          <caret line="23" column="27" lean-forward="true" selection-end-line="27" selection-end-column="1" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pkg/repoer/repoer.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="270">
+          <caret line="60" column="22" lean-forward="true" selection-start-line="60" selection-start-column="22" selection-end-line="60" selection-end-column="22" />
+          <folding>
+            <element signature="e#16#143#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pkg/leader/leader.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="269">
+          <caret line="34" column="1" lean-forward="true" selection-start-line="34" selection-start-column="1" selection-end-line="34" selection-end-column="1" />
+          <folding>
+            <element signature="e#16#183#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
