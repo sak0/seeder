@@ -15,8 +15,9 @@ func TestMustGetMyIpAddr(t *testing.T) {
 }
 
 func TestHarborAuth(t *testing.T) {
-	os.Setenv("HARBOR_ADDR", "192.168.0.1")
-	os.Setenv("HARBOR_PORT", "8500")
+	os.Setenv("HARBOR_USER", "admin")
+	os.Setenv("HARBOR_PASSWD", "Harbor12345")
+
 	err := HarborAuth()
 	if err != nil {
 		t.Fatalf("get harbor auth info failed: %v", err)
