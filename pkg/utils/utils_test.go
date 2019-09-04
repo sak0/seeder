@@ -12,3 +12,10 @@ func TestMustGetMyIpAddr(t *testing.T) {
 	}
 	glog.V(2).Infof("test get ip addr: %s", addr)
 }
+
+func TestHarborAuth(t *testing.T) {
+	err := HarborAuth()
+	if err != nil {
+		t.Fatalf("get harbor auth info failed: %v", err)
+	}
+}
