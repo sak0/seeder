@@ -3,6 +3,7 @@ package utils
 import (
 	"testing"
 	"github.com/golang/glog"
+	"os"
 )
 
 func TestMustGetMyIpAddr(t *testing.T) {
@@ -14,6 +15,8 @@ func TestMustGetMyIpAddr(t *testing.T) {
 }
 
 func TestHarborAuth(t *testing.T) {
+	os.Setenv("HARBOR_ADDR", "192.168.0.1")
+	os.Setenv("HARBOR_PORT", "8500")
 	err := HarborAuth()
 	if err != nil {
 		t.Fatalf("get harbor auth info failed: %v", err)
